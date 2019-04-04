@@ -14,7 +14,7 @@ import customer.CustomerFacade;
 @SuppressWarnings("unused")
 public class Test {
 
-	@SuppressWarnings({ "unused" })
+	@SuppressWarnings({ "unused", "deprecation" })
 	public static void main(String[] args) throws Exception, IllegalAccessException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		System.out.println("Start");
@@ -22,7 +22,6 @@ public class Test {
 		// CustomerFacade Methods
 
 		// CustomerFacade customerFacade = new CustomerFacade();
-		// Customer c2 = new Customer("Sean Hed", "1234");
 		// Customer c3 = new Customer("Michaelz", "123");
 		// Customer c4 = new Customer("Tomerz", "12345");
 		// System.out.println(c2 + ", " + c3+ ", " + c4 );
@@ -94,7 +93,8 @@ public class Test {
 		
 		
 		clients.CustomerFacade customerFacade = new clients.CustomerFacade();
-		customerFacade.purchaseCoupon(coupon);
+		Customer c2 = new Customer("Sean Hed", "1234");
+		customerFacade.purchaseCoupon(c2, coupon);
 		
 
 		System.out.println("End");

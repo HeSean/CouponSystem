@@ -10,6 +10,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import customer.Customer;
+
 public class CouponDBDAO implements CouponDAO {
 
 	public CouponDBDAO() {
@@ -46,8 +48,8 @@ public class CouponDBDAO implements CouponDAO {
 		}
 	}
 
-	public boolean checkCouponName(Coupon coupon) throws Exception { // checking to see if a coupon already exists with
-																		// name
+	// checking to see if a coupon already exists with new name
+	public boolean checkCouponName(Coupon coupon) throws Exception {
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
@@ -257,8 +259,32 @@ public class CouponDBDAO implements CouponDAO {
 		}
 	}
 
-	public boolean canBuy(Coupon coupon) throws Exception {
-		boolean isOkayToBuy = true;
+	// did the customer already purchase a coupon like this
+	public boolean hasAlreadyBought(Customer customer, Coupon coupon) throws Exception {
+		boolean boughtOnce = false;
+		ArrayList<Long> couponsID = new ArrayList<Long>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "select * from customer_coupon WHERE cust_ID = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, customer.getId());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				long id = resultSet.getLong("coupon_ID");
+				couponsID.add(id);
+			}
+			for (Long couponID : couponsID) {
+				if (couponID == coupon.getId()) {
+					boughtOnce = true;
+				}
+			}
+			return boughtOnce;
+		}
+	}
+
+	// can the wanted coupon be bought?
+	public int canBuy(Customer customer, Coupon coupon) throws Exception {
+		//boolean isOkayToBuy = true;
+		int msg = 1;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		int amount = 0;
 		String endDate = null;
@@ -267,22 +293,49 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.setLong(1, coupon.getId());
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-				 amount = resultSet.getInt("amount");
-				 endDate = resultSet.getString("end_Date");
+				amount = resultSet.getInt("amount");
+				endDate = resultSet.getString("end_Date");
 			}
 			Date eDate = Date.valueOf(endDate);
-			//System.out.println("Amount " + amount + "\nEnd Date " + eDate);
+			// System.out.println("Amount " + amount + "\nEnd Date " + eDate);
 			// 1. verify the client hasnt purchased a SIMILAR coupon before
-			
+			if (hasAlreadyBought(customer, coupon)) {
+				//isOkayToBuy = false;
+				msg = 2;
+			}
 			// 2. verify coupon amount > 0
 			if (amount <= 0) {
-				isOkayToBuy = false;
+				//isOkayToBuy = false;
+				msg = 3;
 			}
 			// 3. verify coupon hasnt expired
 			if (eDate.before(new java.util.Date())) {
-				isOkayToBuy = false;
+				//isOkayToBuy = false;
+				msg = 4;
 			}
-			return isOkayToBuy;
+			return msg;
 		}
 	}
+
+	// purchasing coupon
+	public void purchaseCoupon(Customer customer, Coupon coupon) throws Exception {
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = String.format("INSERT INTO customer_coupon (cust_ID, coupon_ID) VALUES (?,?)");
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
+				PreparedStatement.RETURN_GENERATED_KEYS);) {
+			preparedStatement.setLong(1, customer.getId());
+			preparedStatement.setLong(2, coupon.getId());
+			preparedStatement.executeUpdate();
+			ResultSet resultSet = preparedStatement.getGeneratedKeys();
+			resultSet.next();
+			System.out.println("Purchased coupon succesfully. Customer " + customer.getCustName() + " bought coupon - "
+					+ coupon.getTitle());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			connection.close();
+		}
+
+	}
+
 }

@@ -1,2 +1,4 @@
 /NameExistsException.class
 /OutOfStockException.class
+/AlreadyBoughtException.class
+/ExpiredCouponException.class
