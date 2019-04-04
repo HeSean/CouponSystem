@@ -81,16 +81,22 @@ public class Test {
 		//adminFacade.createCompany(companyCheck);
 		//Customer customerCheck = new Customer("Sean", "12345");
 		//adminFacade.createCustomer(customerCheck);
-		
+		// adminFacade.updateCompany(1, "1234", "sean@gmail.com");
+		// adminFacade.updateCustomer(1, "12347785");
 		
 		
 		clients.CompanyFacade companyFacade = new clients.CompanyFacade();
-		//Coupon coupon = new Coupon	(4L,"Free drink with meal", new java.sql.Date(119, 3, 31), new java.sql.Date(119, 10, 1), 4, CouponType.FOOD, "free drink", 10);
+		Coupon coupon = new Coupon	(4L,"Free drink with meal", new java.sql.Date(119, 3, 31), new java.sql.Date(119, 10, 1), 4, CouponType.FOOD, "free drink", 10);
 		//companyFacade.createCoupon(coupon);
-		companyFacade.getCouponByType(CouponType.FOOD);
+		//companyFacade.getCouponByType(CouponType.FOOD);
+		//companyFacade.getAllCoupons();
+		//companyFacade.getCouponByPrice(10);
 		
-		// adminFacade.updateCompany(1, "1234", "sean@gmail.com");
-		// adminFacade.updateCustomer(1, "12347785");
+		
+		clients.CustomerFacade customerFacade = new clients.CustomerFacade();
+		customerFacade.purchaseCoupon(coupon);
+		
+
 		System.out.println("End");
 	}
 }

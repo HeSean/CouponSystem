@@ -45,14 +45,16 @@ public class CouponDBDAO implements CouponDAO {
 			connection.close();
 		}
 	}
-	public  boolean checkCouponName(Coupon coupon) throws Exception { //checking to see if a coupon already exists with name
+
+	public boolean checkCouponName(Coupon coupon) throws Exception { // checking to see if a coupon already exists with
+																		// name
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		Statement statement = connection.createStatement();
 		String sql = "SELECT title FROM coupons";
 		ResultSet resultSet = statement.executeQuery(sql);
-		
+
 		while (resultSet.next()) {
 			String couponName = resultSet.getString("title");
 			names.add(couponName);
@@ -60,7 +62,7 @@ public class CouponDBDAO implements CouponDAO {
 		for (String name : names) {
 			if (name.equals(coupon.getTitle())) {
 				return true;
-		}
+			}
 		}
 		connection.close();
 		return exists;
@@ -134,8 +136,7 @@ public class CouponDBDAO implements CouponDAO {
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-				
-				
+
 				Date sDate = Date.valueOf(startDate);
 				Date eDate = Date.valueOf(endDate);
 
@@ -185,7 +186,7 @@ public class CouponDBDAO implements CouponDAO {
 			coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
 			System.out.printf(
 					"\nid- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s",
-					id, title, sDate, eDate, amount, type, message, price,image);
+					id, title, sDate, eDate, amount, type, message, price, image);
 		}
 		System.out.println();
 		connection.close();
@@ -196,35 +197,92 @@ public class CouponDBDAO implements CouponDAO {
 	public Collection<Coupon> getCouponByType(CouponType wantedType) throws Exception {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		
 
 		String sql = "select * from coupons WHERE type = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, wantedType.name());
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-		while (resultSet.next()) {
-			long id = resultSet.getLong("id");
-			String title = resultSet.getString("title");
-			String startDate = resultSet.getString(3);
-			String endDate = resultSet.getString(4);
-			int amount = resultSet.getInt("amount");
-			String type = resultSet.getString(6);
-			String message = resultSet.getString("message");
-			Double price = resultSet.getDouble("price");
-			String image = resultSet.getString("image");
-			Date sDate = Date.valueOf(startDate);
-			Date eDate = Date.valueOf(endDate);
+			while (resultSet.next()) {
+				long id = resultSet.getLong("id");
+				String title = resultSet.getString("title");
+				String startDate = resultSet.getString(3);
+				String endDate = resultSet.getString(4);
+				int amount = resultSet.getInt("amount");
+				String type = resultSet.getString(6);
+				String message = resultSet.getString("message");
+				Double price = resultSet.getDouble("price");
+				String image = resultSet.getString("image");
+				Date sDate = Date.valueOf(startDate);
+				Date eDate = Date.valueOf(endDate);
 
-			coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
-			System.out.printf(
-					"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
-					id, title, sDate, eDate, amount, type, message, price,image);
+				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				System.out.printf(
+						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
+						id, title, sDate, eDate, amount, type, message, price, image);
+			}
+			connection.close();
+			return coupons;
 		}
-		connection.close();
-		return coupons;
 	}
 
+	public Collection<Coupon> getCouponByPrice(double wantedPrice) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "select * from coupons WHERE price < ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setDouble(1, wantedPrice);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				long id = resultSet.getLong("id");
+				String title = resultSet.getString("title");
+				String startDate = resultSet.getString(3);
+				String endDate = resultSet.getString(4);
+				int amount = resultSet.getInt("amount");
+				String type = resultSet.getString(6);
+				String message = resultSet.getString("message");
+				Double price = resultSet.getDouble("price");
+				String image = resultSet.getString("image");
+				Date sDate = Date.valueOf(startDate);
+				Date eDate = Date.valueOf(endDate);
+
+				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				System.out.printf(
+						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
+						id, title, sDate, eDate, amount, type, message, price, image);
+			}
+			connection.close();
+			return coupons;
+		}
 	}
 
+	public boolean canBuy(Coupon coupon) throws Exception {
+		boolean isOkayToBuy = true;
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		int amount = 0;
+		String endDate = null;
+		String sql = "SELECT amount, end_Date from coupons WHERE id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, coupon.getId());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				 amount = resultSet.getInt("amount");
+				 endDate = resultSet.getString("end_Date");
+			}
+			Date eDate = Date.valueOf(endDate);
+			//System.out.println("Amount " + amount + "\nEnd Date " + eDate);
+			// 1. verify the client hasnt purchased a SIMILAR coupon before
+			
+			// 2. verify coupon amount > 0
+			if (amount <= 0) {
+				isOkayToBuy = false;
+			}
+			// 3. verify coupon hasnt expired
+			if (eDate.before(new java.util.Date())) {
+				isOkayToBuy = false;
+			}
+			return isOkayToBuy;
+		}
+	}
 }
