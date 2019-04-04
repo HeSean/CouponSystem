@@ -167,6 +167,7 @@ public class CouponDBDAO implements CouponDAO {
 					"\nid- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s",
 					id, title, sDate, eDate, amount, type, message, price,image);
 		}
+		System.out.println();
 		connection.close();
 		return coupons;
 	}

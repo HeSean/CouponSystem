@@ -57,7 +57,13 @@ public class Customer {
 	
 	public Collection<Coupon> getCoupons() {
 		return coupons;
+		
 	}
+	
+	public void addCoupon(Coupon coupon) {
+		coupons.add(coupon);
+	}
+	
 
 
 	@Override

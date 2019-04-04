@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 import coupon.Coupon;
 
 public class CustomerDBDAO implements CustomerDAO {
@@ -44,6 +43,27 @@ public class CustomerDBDAO implements CustomerDAO {
 		}
 	}
 
+	public  boolean checkCustomerName(Customer customer) throws Exception { //checking to see if a customer already exists with name
+		boolean exists = false;
+		ArrayList<String> names = new ArrayList<>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		Statement statement = connection.createStatement();
+		String sql = "SELECT cust_name FROM customers";
+		ResultSet resultSet = statement.executeQuery(sql);
+		
+		while (resultSet.next()) {
+			String customerName = resultSet.getString("cust_name");
+			names.add(customerName);
+		}
+		for (String name : names) {
+			if (name.equals(customer.getCustName())) {
+				return true;
+		}
+		}
+		connection.close();
+		return exists;
+	}
+	
 	@Override
 	public void removeCustomer(Customer customer) throws SQLException {
 		// TODO Auto-generated method stub
@@ -71,12 +91,11 @@ public class CustomerDBDAO implements CustomerDAO {
 	public void updateCustomer(Customer customer) throws SQLException {
 		// TODO Auto-generated method stub
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format("UPDATE customers set cust_name = ?, password = ? WHERE id = ?");
+		String sql = String.format("UPDATE customers set password = ? WHERE id = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			connection.setAutoCommit(false);
-			preparedStatement.setString(1, customer.getCustName());
-			preparedStatement.setString(2, customer.getPassword());
-			preparedStatement.setLong(3, customer.getId());
+			preparedStatement.setString(1, customer.getPassword());
+			preparedStatement.setLong(2, customer.getId());
 			preparedStatement.executeUpdate();
 			System.out.println("\nUpdate succesful.\nNew Data - " + customer);
 			connection.commit();
@@ -99,7 +118,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			
 			String custName = resultSet.getString("cust_name");
 			String password = resultSet.getString("password");
-			System.out.printf("id- %d | name- %s | password - %s ", id, custName, password);
+			//System.out.printf("id- %d | name- %s | password - %s ", id, custName, password);
 			wantedCustomer.setId(id);
 			wantedCustomer.setCustName(custName);
 			wantedCustomer.setPassword(password);

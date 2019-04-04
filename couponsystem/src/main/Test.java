@@ -2,7 +2,7 @@ package main;
 
 import java.util.Date;
 
-
+import clients.AdminFacade;
 import company.Company;
 import company.CompanyFacade;
 import coupon.Coupon;
@@ -11,6 +11,7 @@ import coupon.CouponType;
 import customer.Customer;
 import customer.CustomerFacade;
 
+@SuppressWarnings("unused")
 public class Test {
 
 	@SuppressWarnings({ "unused" })
@@ -65,7 +66,16 @@ public class Test {
 		// couponFacade.createCoupon(coupon3);
 		//couponFacade.getCoupon(1);
 		couponFacade.getAllCoupons();
+		
+		AdminFacade adminFacade = new AdminFacade();
+		Company companyCheck = new Company("SEAn", "123", "sean@hotmail.com");
+		adminFacade.createCompany(companyCheck);
 
+		Customer customer = new Customer("Sean", "12345");
+		adminFacade.createCustomer(customer);
+		
+		//adminFacade.updateCompany(1, "1234", "sean@gmail.com");
+		adminFacade.updateCustomer(1, "12347785");
 		System.out.println("\nEnd");
 	}
 }
