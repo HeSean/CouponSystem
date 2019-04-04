@@ -23,15 +23,13 @@ public class AdminFacade implements CouponClientFacade {
 		// TODO Auto-generated constructor stub
 	}
 
-	
-	
 	// Company Methods
 	public void createCompany(Company company) throws NameExistsException {
 		try {
 			if (!companyDBDAO.checkCompanyName(company)) {
 				companyDBDAO.createCompany(company);
 			} else
-				throw new NameExistsException(company.getCompName(),company);
+				throw new NameExistsException(company.getCompName(), company);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -39,14 +37,17 @@ public class AdminFacade implements CouponClientFacade {
 
 	public void removeCompany(Company company) throws Exception {
 		companyDBDAO.removeCompany(company);
-		// חסר מחיקת הקופונים של אותה חברה וגם קופונים שנרכשו על ידי לקוחות
+		// missing removal of company's coupons and coupons purchased by customers
 	}
 
-	public void updateCompany(long id, String password, String email) throws Exception {
-		Company beforeUpdate = companyDBDAO.getCompany(id);
-		Company afterUpdate = new Company(id, beforeUpdate.getCompName(), password, email);
-		companyDBDAO.updateCompany(afterUpdate);
+	public void updateCompany (Company company) throws Exception{
+		companyDBDAO.updateCompany(company);
 	}
+//	public void updateCompany(long id, String password, String email) throws Exception {
+//		Company beforeUpdate = companyDBDAO.getCompany(id);
+//		Company afterUpdate = new Company(id, beforeUpdate.getCompName(), password, email);
+//		companyDBDAO.updateCompany(afterUpdate);
+//	}
 
 	public void getCompany(long id) throws Exception {
 		companyDBDAO.getCompany(id);
@@ -55,11 +56,9 @@ public class AdminFacade implements CouponClientFacade {
 	public void getAllCompanies() throws Exception {
 		companyDBDAO.getAllCompanys();
 	}
-	
-	
-	
-	//Customer Methods
-	public void createCustomer(Customer customer)throws NameExistsException {
+
+	// Customer Methods
+	public void createCustomer(Customer customer) throws NameExistsException {
 		try {
 			if (!customerDBDAO.checkCustomerName(customer)) {
 				customerDBDAO.createCustomer(customer);
@@ -72,12 +71,17 @@ public class AdminFacade implements CouponClientFacade {
 
 	public void removeCustomer(Customer customer) throws Exception {
 		customerDBDAO.removeCustomer(customer);
+		// missing removal of coupon purchase history
 	}
 
-	public void updateCustomer(long id, String password) throws Exception {
-		Customer beforeUpdate = customerDBDAO.getCustomer(id);
-		Customer afterUpdate = new Customer(id, beforeUpdate.getCustName(), password);
-		customerDBDAO.updateCustomer(afterUpdate);
+	public void updateCustomer(Customer customer) throws Exception {
+		customerDBDAO.updateCustomer(customer);
+
+		// updateCustomer(long id, String password)
+		// Customer beforeUpdate = customerDBDAO.getCustomer(id);
+		// Customer afterUpdate = new Customer(id, beforeUpdate.getCustName(),
+		// password);
+		// customerDBDAO.updateCustomer(afterUpdate);
 	}
 
 	public void getCustomer(long id) throws Exception {
@@ -87,7 +91,5 @@ public class AdminFacade implements CouponClientFacade {
 	public void getAllCustomers() throws Exception {
 		customerDBDAO.getAllCustomers();
 	}
-	
-	
 
 }

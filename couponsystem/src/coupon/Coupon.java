@@ -32,6 +32,21 @@ public class Coupon {
 		setPrice(price);
 		setImage("null");
 	}
+	
+	public Coupon(Long id,String title, Date startDate, Date endDate, int amount, CouponType type, String message,
+			double price) {
+		// String image) {
+		super();
+		setId(id);
+		setTitle(title);
+		setStartDate(startDate);
+		setEndDate(endDate);
+		setAmount(amount);
+		setType(type);
+		setMessage(message);
+		setPrice(price);
+		setImage("null");
+	}
 
 	public Coupon(Long id, String title, Date sDate, Date eDate, int amount, String type, String message, Double price) {
 		super();

@@ -8,10 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-
-import javax.print.attribute.standard.RequestingUserName;
-
 import coupon.Coupon;
 
 public class CompanyDBDAO implements CompanyDAO {
