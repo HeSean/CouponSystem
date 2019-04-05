@@ -16,8 +16,10 @@ public interface CustomerDAO {
 
 	public Collection<Customer> getAllCustomers() throws Exception;
 
-	public Collection<Coupon> getAllCoupons() throws Exception;
+	public Collection<Coupon> getAllCoupons(long id) throws Exception;
 
 	public boolean login(String custName, String password) throws Exception;
+
+	
 
 }

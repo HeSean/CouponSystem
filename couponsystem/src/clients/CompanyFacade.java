@@ -20,6 +20,7 @@ public class CompanyFacade {
 		try {
 			if (!couponDBDAO.checkCouponName(coupon)) {
 				couponDBDAO.createCoupon(coupon);
+				// add company-coupon to table
 			} else
 				throw new NameExistsException(coupon.getTitle(), coupon);
 		} catch (Exception e) {

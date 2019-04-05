@@ -1,6 +1,7 @@
 package customer;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import coupon.Coupon;
+import coupon.CouponDBDAO;
 
 public class CustomerDBDAO implements CustomerDAO {
 
@@ -43,14 +45,15 @@ public class CustomerDBDAO implements CustomerDAO {
 		}
 	}
 
-	public  boolean checkCustomerName(Customer customer) throws Exception { //checking to see if a customer already exists with name
+	public boolean checkCustomerName(Customer customer) throws Exception { // checking to see if a customer already
+																			// exists with name
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		Statement statement = connection.createStatement();
 		String sql = "SELECT cust_name FROM customers";
 		ResultSet resultSet = statement.executeQuery(sql);
-		
+
 		while (resultSet.next()) {
 			String customerName = resultSet.getString("cust_name");
 			names.add(customerName);
@@ -58,12 +61,12 @@ public class CustomerDBDAO implements CustomerDAO {
 		for (String name : names) {
 			if (name.equals(customer.getCustName())) {
 				return true;
-		}
+			}
 		}
 		connection.close();
 		return exists;
 	}
-	
+
 	@Override
 	public void removeCustomer(Customer customer) throws SQLException {
 		// TODO Auto-generated method stub
@@ -115,13 +118,14 @@ public class CustomerDBDAO implements CustomerDAO {
 			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-			
-			String custName = resultSet.getString("cust_name");
-			String password = resultSet.getString("password");
-			//System.out.printf("id- %d | name- %s | password - %s ", id, custName, password);
-			wantedCustomer.setId(id);
-			wantedCustomer.setCustName(custName);
-			wantedCustomer.setPassword(password);
+
+				String custName = resultSet.getString("cust_name");
+				String password = resultSet.getString("password");
+				// System.out.printf("id- %d | name- %s | password - %s ", id, custName,
+				// password);
+				wantedCustomer.setId(id);
+				wantedCustomer.setCustName(custName);
+				wantedCustomer.setPassword(password);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -154,12 +158,80 @@ public class CustomerDBDAO implements CustomerDAO {
 		return customers;
 	}
 
-	@Override
-	public Collection<Coupon> getAllCoupons() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<Long> getCouponsID(long wantedID) throws Exception {
+		ArrayList<Long> couponsID = new ArrayList<Long>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "SELECT coupon_ID from customer_coupon WHERE cust_ID = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, wantedID);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				couponsID.add(resultSet.getLong("coupon_id"));
+			}
+			connection.close();
+			return couponsID;
+		}
 	}
 
+	@Override
+	public Collection<Coupon> getAllCoupons(long wantedID) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+
+		String sql = "select * from customer_coupon WHERE cust_id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, wantedID);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			
+			while (resultSet.next()) {
+				long id = resultSet.getLong("id");
+				String title = resultSet.getString("title");
+				String startDate = resultSet.getString(3);
+				String endDate = resultSet.getString(4);
+				int amount = resultSet.getInt("amount");
+				String type = resultSet.getString(6);
+				String message = resultSet.getString("message");
+				Double price = resultSet.getDouble("price");
+				String image = resultSet.getString("image");
+				Date sDate = Date.valueOf(startDate);
+				Date eDate = Date.valueOf(endDate);
+
+				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+			}
+			connection.close();
+			return coupons;
+		}
+	}	
+
+	public Collection<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		ResultSet resultSet;
+		String sql = "select * from coupons WHERE id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			for (Long iLong : ids) {
+				preparedStatement.setLong(1, iLong);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					long id = resultSet.getLong("id");
+					String title = resultSet.getString("title");
+					String startDate = resultSet.getString(3);
+					String endDate = resultSet.getString(4);
+					int amount = resultSet.getInt("amount");
+					String type = resultSet.getString(6);
+					String message = resultSet.getString("message");
+					Double price = resultSet.getDouble("price");
+					String image = resultSet.getString("image");
+					Date sDate = Date.valueOf(startDate);
+					Date eDate = Date.valueOf(endDate);
+
+					coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				}
+			}
+			connection.close();
+			return coupons;
+		}
+	}	
 	@Override
 	public boolean login(String custName, String password) {
 		// TODO Auto-generated method stub

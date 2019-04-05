@@ -277,8 +277,12 @@ public class CouponDBDAO implements CouponDAO {
 					boughtOnce = true;
 				}
 			}
-			return boughtOnce;
+		} catch (Exception e) {
+			System.out.println("no coupons were bought by any customer.");
+		} finally {
+			connection.close();
 		}
+		return boughtOnce;
 	}
 
 	// can the wanted coupon be bought?
@@ -330,6 +334,7 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet.next();
 			System.out.println("Purchased coupon succesfully. Customer " + customer.getCustName() + " bought coupon - "
 					+ coupon.getTitle());
+			customer.addCoupon(coupon);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

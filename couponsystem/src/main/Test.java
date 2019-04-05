@@ -20,7 +20,6 @@ public class Test {
 		System.out.println("Start");
 
 		// CustomerFacade Methods
-
 		// CustomerFacade customerFacade = new CustomerFacade();
 		// Customer c3 = new Customer("Michaelz", "123");
 		// Customer c4 = new Customer("Tomerz", "12345");
@@ -33,7 +32,6 @@ public class Test {
 		// customerFacade.updateCustomer(customer);
 
 		// CompanyFacade Methods
-
 		// CompanyFacade companyFacade = new CompanyFacade();
 		// Company company1 = new Company("zzimz", "1234", "zzimz@gmail.com");
 		// Company company2 = new Company("zzimz hapoalim", "444",
@@ -47,7 +45,6 @@ public class Test {
 		// companyFacade.getAllCompanies();
 
 		// CouponFacade Methods
-
 		// CouponFacade couponFacade = new CouponFacade();
 		// Coupon coupon = new Coupon("food", new java.sql.Date(1220227200L * 1000), new
 		// java.sql.Date(1220227200L * 1000),
@@ -94,7 +91,9 @@ public class Test {
 		
 		clients.CustomerFacade customerFacade = new clients.CustomerFacade();
 		Customer c2 = new Customer("Sean Hed", "1234");
-		customerFacade.purchaseCoupon(c2, coupon);
+	    //customerFacade.purchaseCoupon(c2, coupon);
+		System.out.println(customerFacade.getPurchaseHistory(2));
+		System.out.println(c2.getCoupons());
 		
 
 		System.out.println("End");

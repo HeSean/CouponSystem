@@ -2,3 +2,4 @@
 /OutOfStockException.class
 /AlreadyBoughtException.class
 /ExpiredCouponException.class
+/EmptyException.class

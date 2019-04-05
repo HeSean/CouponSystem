@@ -1,5 +1,6 @@
 package customer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import coupon.Coupon;
@@ -9,7 +10,7 @@ public class Customer {
 	private long id;
 	private String custName;
 	private String password;
-	private Collection<Coupon> coupons;
+	private ArrayList<Coupon> coupons;
 	
 	public Customer() {
 		
@@ -55,7 +56,8 @@ public class Customer {
 		this.password = password;
 	}
 	
-	public Collection<Coupon> getCoupons() {
+	public ArrayList<Coupon> getCoupons() {
+		System.out.println(coupons);
 		return coupons;
 		
 	}
