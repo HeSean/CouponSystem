@@ -2,6 +2,7 @@ package clients;
 
 import java.util.Collection;
 
+import company.CompanyDBDAO;
 import coupon.Coupon;
 import coupon.CouponDBDAO;
 import coupon.CouponType;
@@ -10,7 +11,8 @@ import exception.NameExistsException;
 public class CompanyFacade {
 
 	CouponDBDAO couponDBDAO = new CouponDBDAO();
-	
+	CompanyDBDAO companyDBDAO = new CompanyDBDAO();
+
 	public CompanyFacade() {
 		// TODO Auto-generated constructor stub
 	}
@@ -28,7 +30,7 @@ public class CompanyFacade {
 		}
 	}
 
-	// Method for removing coupon 
+	// Method for removing coupon
 	public void removeCoupon(Coupon coupon) throws Exception {
 		couponDBDAO.removeCoupon(coupon);
 	}
@@ -42,12 +44,17 @@ public class CompanyFacade {
 		return couponDBDAO.getCoupon(id);
 	}
 
-	public Collection<Coupon> getAllCoupons() throws Exception {
-		return couponDBDAO.getAllCoupons();
+	public Collection<Coupon> getAllCoupons(long id) throws Exception {
+		return companyDBDAO.getCoupons(companyDBDAO.getCouponsID(id));
 	}
 
 	public Collection<Coupon> getCouponByType(CouponType cType) throws Exception {
-		return couponDBDAO.getCouponByType(cType);
+		Collection<Coupon> coupons = couponDBDAO.getCouponByType(cType);
+		if (!coupons.isEmpty()) {
+			return coupons;
+		} else
+			System.out.println("No coupons were found under that price - " + cType);
+		return null;
 	}
 
 	public Collection<Coupon> getCouponByPrice(double price) throws Exception {

@@ -47,7 +47,7 @@ public class CouponSystem {
 	}
 	
 	public void stopTask() {
-		System.out.println("Stopping thread in charge of removing expired coupons");
+		System.out.println("Stopping thread in charge of removing expired coupons...");
 		if (update != null) {
 			runnable.terminate();
 			System.out.println("Thread stopped");

@@ -1,6 +1,7 @@
 package company;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +10,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import coupon.Coupon;
+import coupon.CouponDBDAO;
 
 public class CompanyDBDAO implements CompanyDAO {
+
+	CouponDBDAO couponDBDAO = new CouponDBDAO();
 
 	public CompanyDBDAO() {
 		// TODO Auto-generated constructor stub
@@ -18,10 +22,8 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public void createCompany(Company company) throws Exception {
-
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("INSERT INTO companys (id, comp_name, password,email) VALUES (?,?,?,?)");
-
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
 			preparedStatement.setLong(1, company.getId());
@@ -40,14 +42,15 @@ public class CompanyDBDAO implements CompanyDAO {
 		}
 	}
 
-	public  boolean checkCompanyName(Company company) throws Exception { //checking to see if a company already exists with name
+	// checking to see if a company already exists with wanted name
+	public boolean checkCompanyName(Company company) throws Exception {
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		Statement statement = connection.createStatement();
 		String sql = "SELECT comp_name FROM companys";
 		ResultSet resultSet = statement.executeQuery(sql);
-		
+
 		while (resultSet.next()) {
 			String companyName = resultSet.getString("comp_name");
 			names.add(companyName);
@@ -55,7 +58,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		for (String name : names) {
 			if (name.equals(company.getCompName())) {
 				return true;
-		}
+			}
 		}
 		connection.close();
 		return exists;
@@ -64,16 +67,21 @@ public class CompanyDBDAO implements CompanyDAO {
 	@Override
 	public void removeCompany(Company company) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-
-		String sql = String.format("delete from companys where id=?");
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		String couponSQL = String.format("delete from companys where id=?");
+		String couponsCompanySQL = String.format("delete * company_coupon where comp_ID=?");
+		PreparedStatement preparedStatement = connection.prepareStatement(couponSQL);
+		try {
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, company.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful");
-			connection.commit();
+			System.out.println("Comapny removal from Company table succesful");
 
+			preparedStatement = connection.prepareStatement(couponsCompanySQL);
+			connection.setAutoCommit(false);
+			preparedStatement.setLong(1, company.getId());
+			preparedStatement.executeUpdate();
+			System.out.println("Coupons removal succesful from Company - Coupon Table");
+			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -84,7 +92,6 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public void updateCompany(Company company) throws Exception {
-
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("UPDATE companys set email = ?, password = ? WHERE id = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -135,9 +142,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		ArrayList<Company> companys = new ArrayList<Company>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		Statement statement = connection.createStatement();
-
 		String sql = "select * from companys";
-
 		ResultSet resultSet = statement.executeQuery(sql);
 
 		while (resultSet.next()) {
@@ -153,11 +158,73 @@ public class CompanyDBDAO implements CompanyDAO {
 		return companys;
 	}
 
+	// how to get company ID for selecting the right coupons??
 	@Override
 	public Collection<Coupon> getAllCoupons() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "SELECT * from company_coupon WHERE comp_ID = ?";
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, );
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				long id = resultSet.getLong("coupon_id");
+				coupons.add(couponDBDAO.getCoupon(id));
+			}
+		}
+		System.out.println();
+		connection.close();
+		return coupons;
 	}
+
+	// get all coupon ids created by company
+	public Collection<Long> getCouponsID(long wantedID) throws Exception {
+		Collection<Long> couponsID = new ArrayList<Long>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, wantedID);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				couponsID.add(resultSet.getLong("coupon_ID"));
+			}
+			connection.close();
+			return couponsID;
+		}
+	}
+	
+	//get all coupons the company created
+	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
+		Collection<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		ResultSet resultSet;
+		String sql = "select * from coupons WHERE id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			for (Long iLong : ids) {
+				preparedStatement.setLong(1, iLong);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					long id = resultSet.getLong("id");
+					String title = resultSet.getString("title");
+					String startDate = resultSet.getString(3);
+					String endDate = resultSet.getString(4);
+					int amount = resultSet.getInt("amount");
+					String type = resultSet.getString(6);
+					String message = resultSet.getString("message");
+					Double price = resultSet.getDouble("price");
+					String image = resultSet.getString("image");
+					Date sDate = Date.valueOf(startDate);
+					Date eDate = Date.valueOf(endDate);
+
+					coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				}
+			}
+			connection.close();
+			return coupons;
+		}
+	}	
 
 	@Override
 	public boolean login(String compName, String password) throws Exception {

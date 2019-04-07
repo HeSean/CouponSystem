@@ -21,6 +21,7 @@ public class CustomerFacade {
 		// TODO Auto-generated constructor stub
 	}
 
+	// customer purcahse coupon 
 	public void purchaseCoupon(Customer customer, Coupon coupon)
 			throws AlreadyBoughtException, OutOfStockException, ExpiredCouponException {
 		try {
@@ -38,6 +39,7 @@ public class CustomerFacade {
 		}
 	}
 
+	// get customers entire purchase history
 	public Collection<Coupon> getPurchaseHistory(long id) throws Exception {
 		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(id);
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
@@ -47,5 +49,7 @@ public class CustomerFacade {
 		}
 			return coupons;
 		}
+	
+	
 	}
 

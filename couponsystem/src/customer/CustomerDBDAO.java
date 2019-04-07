@@ -158,6 +158,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		return customers;
 	}
 
+	// get all coupon ids bought by customer
 	public Collection<Long> getCouponsID(long wantedID) throws Exception {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
@@ -202,7 +203,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			return coupons;
 		}
 	}	
-
+	// get all coupons the customer purchased
 	public Collection<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
