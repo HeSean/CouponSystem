@@ -23,7 +23,7 @@ public class CouponDBDAO implements CouponDAO {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format(
 				"INSERT INTO coupons (id, title, start_Date, end_Date, amount, type, message, price, image) VALUES (?,?,?,?,?,?,?,?,?)");
-
+		
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
 			preparedStatement.setLong(1, coupon.getId());
@@ -35,12 +35,28 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.setString(7, coupon.getMessage());
 			preparedStatement.setDouble(8, coupon.getPrice());
 			preparedStatement.setString(9, coupon.getImage());
-
 			preparedStatement.executeUpdate();
-
 			ResultSet resultSet = preparedStatement.getGeneratedKeys();
 			resultSet.next();
-			System.out.println("New coupon creation succeeded.\n" + coupon);
+			System.out.println("\nNew coupon submit into Coupons table succeeded." + coupon);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			connection.close();
+		}
+	}
+	
+	public void insertCouponToJoinTable (Coupon coupon, long compID) throws Exception {
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sqlCompanyCoupon = "INSERT INTO company_coupon (comp_ID, coupon_ID) VALUSE (?,?)";
+		try  {
+			PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
+					PreparedStatement.RETURN_GENERATED_KEYS);
+			preparedStatement = connection.prepareStatement(sqlCompanyCoupon);
+			preparedStatement.setLong(1, coupon.getId());
+			preparedStatement.setLong(2, compID);
+			preparedStatement.executeUpdate();
+			System.out.println("\nNew coupon submit into Company - Coupon table succeeded." + coupon);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -56,7 +72,6 @@ public class CouponDBDAO implements CouponDAO {
 		Statement statement = connection.createStatement();
 		String sql = "SELECT title FROM coupons";
 		ResultSet resultSet = statement.executeQuery(sql);
-
 		while (resultSet.next()) {
 			String couponName = resultSet.getString("title");
 			names.add(couponName);
@@ -74,16 +89,28 @@ public class CouponDBDAO implements CouponDAO {
 	public void removeCoupon(Coupon coupon) throws Exception {
 		// TODO Auto-generated method stub
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-
-		String sql = String.format("delete from coupons where id=?");
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		String couponsSQL = String.format("delete from coupons where id=?");
+		String couponsCustomerSQL = String.format("delete * customer_coupon where coupon_ID=?");
+		String couponsCompanySQL = String.format("delete * company_coupon where coupon_ID=?");
+		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, coupon.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful");
-			connection.commit();
+			System.out.println("Delete succesful from coupons Table");
 
+			preparedStatement = connection.prepareStatement(couponsCustomerSQL);
+			connection.setAutoCommit(false);
+			preparedStatement.setLong(1, coupon.getId());
+			preparedStatement.executeUpdate();
+			System.out.println("Delete succesful from Customer - Coupon Table");
+
+			preparedStatement = connection.prepareStatement(couponsCompanySQL);
+			connection.setAutoCommit(false);
+			preparedStatement.setLong(1, coupon.getId());
+			preparedStatement.executeUpdate();
+			System.out.println("Delete succesful from Company - Coupon Table");
+			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -287,7 +314,7 @@ public class CouponDBDAO implements CouponDAO {
 
 	// can the wanted coupon be bought?
 	public int canBuy(Customer customer, Coupon coupon) throws Exception {
-		//boolean isOkayToBuy = true;
+		// boolean isOkayToBuy = true;
 		int msg = 1;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		int amount = 0;
@@ -304,17 +331,17 @@ public class CouponDBDAO implements CouponDAO {
 			// System.out.println("Amount " + amount + "\nEnd Date " + eDate);
 			// 1. verify the client hasnt purchased a SIMILAR coupon before
 			if (hasAlreadyBought(customer, coupon)) {
-				//isOkayToBuy = false;
+				// isOkayToBuy = false;
 				msg = 2;
 			}
 			// 2. verify coupon amount > 0
 			if (amount <= 0) {
-				//isOkayToBuy = false;
+				// isOkayToBuy = false;
 				msg = 3;
 			}
 			// 3. verify coupon hasnt expired
 			if (eDate.before(new java.util.Date())) {
-				//isOkayToBuy = false;
+				// isOkayToBuy = false;
 				msg = 4;
 			}
 			return msg;

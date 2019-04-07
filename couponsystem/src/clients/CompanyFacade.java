@@ -10,17 +10,17 @@ import exception.NameExistsException;
 public class CompanyFacade {
 
 	CouponDBDAO couponDBDAO = new CouponDBDAO();
-
+	
 	public CompanyFacade() {
 		// TODO Auto-generated constructor stub
 	}
 
 	// Method for creating a new coupon
-	public void createCoupon(Coupon coupon) throws NameExistsException {
+	public void createCoupon(Coupon coupon, long compID) throws NameExistsException {
 		try {
 			if (!couponDBDAO.checkCouponName(coupon)) {
 				couponDBDAO.createCoupon(coupon);
-				// add company-coupon to table
+				couponDBDAO.insertCouponToJoinTable(coupon, compID);
 			} else
 				throw new NameExistsException(coupon.getTitle(), coupon);
 		} catch (Exception e) {
@@ -28,10 +28,9 @@ public class CompanyFacade {
 		}
 	}
 
-	// Method for removing coupon from company database
+	// Method for removing coupon 
 	public void removeCoupon(Coupon coupon) throws Exception {
 		couponDBDAO.removeCoupon(coupon);
-		// missing removal of coupons purchased by customers
 	}
 
 	// Method for updating coupon details - end date or price
