@@ -12,7 +12,7 @@ import exception.EmptyException;
 import exception.ExpiredCouponException;
 import exception.OutOfStockException;
 
-public class CustomerFacade {
+public class CustomerFacade implements CouponClientFacade {
 
 	CouponDBDAO couponDBDAO = new CouponDBDAO();
 	CustomerDBDAO customerDBDAO = new CustomerDBDAO();
@@ -21,7 +21,27 @@ public class CustomerFacade {
 		// TODO Auto-generated constructor stub
 	}
 
-	// customer purcahse coupon 
+	public void createCustomer(Customer customer) throws Exception {
+		customerDBDAO.createCustomer(customer);
+	}
+
+	public void removeCustomer(Customer customer) throws Exception {
+		customerDBDAO.removeCustomer(customer);
+	}
+
+	public void updateCustomer(Customer customer) throws Exception {
+		customerDBDAO.updateCustomer(customer);
+	}
+
+	public void getCustomer(long id) throws Exception {
+		customerDBDAO.getCustomer(id);
+	}
+
+	public void getAllCustomers() throws Exception {
+		customerDBDAO.getAllCustomers();
+	}
+
+	// customer purcahse coupon
 	public void purchaseCoupon(Customer customer, Coupon coupon)
 			throws AlreadyBoughtException, OutOfStockException, ExpiredCouponException {
 		try {
@@ -47,9 +67,16 @@ public class CustomerFacade {
 		if (!couponsID.isEmpty()) {
 			coupons = (ArrayList<Coupon>) customerDBDAO.getCoupons(couponsID);
 		}
-			return coupons;
-		}
-	
-	
+		return coupons;
 	}
 
+	@Override
+	public CouponClientFacade login(String name, String password, clientType c) throws Exception {
+		CustomerFacade customerFacade = new CustomerFacade();
+		if (customerDBDAO.login(name, password)) {
+			return customerFacade;
+		} else
+			return null;
+	}
+
+}

@@ -12,7 +12,7 @@ public class AdminFacade implements CouponClientFacade {
 	CustomerDBDAO customerDBDAO = new CustomerDBDAO();
 
 	@Override
-	public CouponClientFacade login(String name, String password, clientType c) throws Exception {
+	public  CouponClientFacade login(String name, String password, clientType c) throws Exception {
 		if (name.equals("admin") && password.equals("1234")) {
 			System.out.println("Welcome admin.");
 		}
@@ -49,8 +49,8 @@ public class AdminFacade implements CouponClientFacade {
 //		companyDBDAO.updateCompany(afterUpdate);
 //	}
 
-	public void getCompany(long id) throws Exception {
-		companyDBDAO.getCompany(id);
+	public Company getCompany(long id) throws Exception {
+		return companyDBDAO.getCompany(id);
 	}
 
 	public void getAllCompanies() throws Exception {

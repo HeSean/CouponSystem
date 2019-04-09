@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -23,12 +24,14 @@ public class CouponDBDAO implements CouponDAO {
 		String sql = String.format(
 				"INSERT INTO coupons (id, title, start_Date, end_Date, amount, type, message, price, image) VALUES (?,?,?,?,?,?,?,?,?)");
 		
+		
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
+			
 			preparedStatement.setLong(1, coupon.getId());
 			preparedStatement.setString(2, coupon.getTitle());
-			preparedStatement.setDate(3, coupon.getStartDate());
-			preparedStatement.setDate(4, coupon.getEndDate());
+			preparedStatement.setDate(3, Date.valueOf(coupon.getStartDate()));
+			preparedStatement.setDate(4, Date.valueOf(coupon.getEndDate()));
 			preparedStatement.setInt(5, coupon.getAmount());
 			preparedStatement.setString(6, coupon.getType().name());
 			preparedStatement.setString(7, coupon.getMessage());
@@ -37,7 +40,7 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.executeUpdate();
 			ResultSet resultSet = preparedStatement.getGeneratedKeys();
 			resultSet.next();
-			System.out.println("\nNew coupon submit into Coupons table succeeded." + coupon);
+			System.out.println("\nNew coupon submit into Coupons table succeeded.\n" + coupon);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -46,17 +49,15 @@ public class CouponDBDAO implements CouponDAO {
 	}
 	
 	// insert new created coupon to company-coupon table
-	public void insertCouponToJoinTable (Coupon coupon, long compID) throws Exception {
+	public void insertCouponToJoinTable (long couponID, long compID) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sqlCompanyCoupon = "INSERT INTO company_coupon (comp_ID, coupon_ID) VALUSE (?,?)";
-		try  {
-			PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
-					PreparedStatement.RETURN_GENERATED_KEYS);
-			preparedStatement = connection.prepareStatement(sqlCompanyCoupon);
-			preparedStatement.setLong(1, coupon.getId());
-			preparedStatement.setLong(2, compID);
+		String sqlCompanyCoupon = "INSERT INTO company_coupon (comp_ID, coupon_ID) VALUES (?,?)";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
+				PreparedStatement.RETURN_GENERATED_KEYS);) {
+			preparedStatement.setLong(1, compID);
+			preparedStatement.setLong(2, couponID);
 			preparedStatement.executeUpdate();
-			System.out.println("\nNew coupon submit into Company - Coupon table succeeded." + coupon);
+			System.out.println("\nNew coupon submit into Company - Coupon table succeeded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -127,8 +128,8 @@ public class CouponDBDAO implements CouponDAO {
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(9, coupon.getId());
 			preparedStatement.setString(1, coupon.getTitle());
-			preparedStatement.setDate(2, coupon.getStartDate());
-			preparedStatement.setDate(3, coupon.getEndDate());
+			preparedStatement.setDate(3, Date.valueOf(coupon.getStartDate()));
+			preparedStatement.setDate(4, Date.valueOf(coupon.getEndDate()));
 			preparedStatement.setInt(4, coupon.getAmount());
 			preparedStatement.setString(5, coupon.getType().name());
 			preparedStatement.setString(6, coupon.getMessage());
@@ -156,23 +157,20 @@ public class CouponDBDAO implements CouponDAO {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				String title = resultSet.getString("title");
-				String startDate = resultSet.getString("start_Date");
-				String endDate = resultSet.getString("end_Date");
+				LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+				LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 				int amount = resultSet.getInt("amount");
 				String type = resultSet.getString("type");
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-				Date sDate = Date.valueOf(startDate);
-				Date eDate = Date.valueOf(endDate);
-
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f | image - %s ",
-						id, title, sDate, eDate, amount, type, message, price, image);
+						id, title, startDate, endDate, amount, type, message, price, image);
 				wantedCoupon.setTitle(title);
-				wantedCoupon.setStartDate(sDate);
-				wantedCoupon.setEndDate(eDate);
+				wantedCoupon.setStartDate(startDate);
+				wantedCoupon.setEndDate(endDate);
 				wantedCoupon.setAmount(amount);
 				wantedCoupon.setType(type);
 				wantedCoupon.setMessage(message);
@@ -200,20 +198,18 @@ public class CouponDBDAO implements CouponDAO {
 		while (resultSet.next()) {
 			long id = resultSet.getLong("id");
 			String title = resultSet.getString("title");
-			String startDate = resultSet.getString(3);
-			String endDate = resultSet.getString(4);
+			LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+			LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 			int amount = resultSet.getInt("amount");
 			String type = resultSet.getString(6);
 			String message = resultSet.getString("message");
 			Double price = resultSet.getDouble("price");
 			String image = resultSet.getString("image");
-			Date sDate = Date.valueOf(startDate);
-			Date eDate = Date.valueOf(endDate);
 
-			coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+			coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 			System.out.printf(
 					"\nid- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s",
-					id, title, sDate, eDate, amount, type, message, price, image);
+					id, title, startDate, endDate, amount, type, message, price, image);
 		}
 		System.out.println();
 		connection.close();
@@ -233,20 +229,19 @@ public class CouponDBDAO implements CouponDAO {
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String title = resultSet.getString("title");
-				String startDate = resultSet.getString(3);
-				String endDate = resultSet.getString(4);
+				LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+				LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 				int amount = resultSet.getInt("amount");
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-				Date sDate = Date.valueOf(startDate);
-				Date eDate = Date.valueOf(endDate);
+			
 
-				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
-						id, title, sDate, eDate, amount, type, message, price, image);
+						id, title, startDate, endDate, amount, type, message, price, image);
 			}
 			connection.close();
 			return coupons;
@@ -264,20 +259,19 @@ public class CouponDBDAO implements CouponDAO {
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String title = resultSet.getString("title");
-				String startDate = resultSet.getString(3);
-				String endDate = resultSet.getString(4);
+				LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+				LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 				int amount = resultSet.getInt("amount");
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-				Date sDate = Date.valueOf(startDate);
-				Date eDate = Date.valueOf(endDate);
+	
 
-				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
-						id, title, sDate, eDate, amount, type, message, price, image);
+						id, title, startDate, endDate, amount, type, message, price, image);
 			}
 			connection.close();
 			return coupons;

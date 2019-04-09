@@ -15,7 +15,7 @@ public interface CompanyDAO {
 		
 		public Collection<Company> getAllCompanys() throws Exception;
 
-		public Collection<Coupon> getAllCoupons() throws Exception;
+		public Collection<Coupon> getCoupons() throws Exception;
 
 		public boolean login(String compName, String password) throws Exception;
 }

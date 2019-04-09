@@ -1,5 +1,6 @@
 package company;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import coupon.Coupon;
 
@@ -9,7 +10,7 @@ public class Company {
 	private String compName;
 	private String password;
 	private String email;
-	private Collection<Coupon> coupons;
+	private Collection<Coupon> coupons = new ArrayList<Coupon>();
 
 	public Company() {
 
@@ -30,7 +31,6 @@ public class Company {
 	}
 
 	public Company(long id2, String compName2, String password2, String email2) {
-		// TODO Auto-generated constructor stub
 		setId(id2);
 		setCompName(compName2);
 		setPassword(password2);
@@ -70,11 +70,11 @@ public class Company {
 	}
 
 	public Collection<Coupon> getCoupons() {
-		return coupons;
+		return this.coupons;
 	}
 	
-	public void setCoupons(Collection<Coupon> coupons) {
-		this.coupons = coupons;
+	public void addCoupon(Coupon coupon) {
+		this.coupons.add(coupon);
 	}
 
 

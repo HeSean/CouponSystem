@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import coupon.Coupon;
@@ -122,11 +123,11 @@ public class CompanyDBDAO implements CompanyDAO {
 				String compName = resultSet.getString("comp_Name");
 				String password = resultSet.getString("password");
 				String email = resultSet.getString("email");
-				System.out.printf("id- %d | name- %s | password - %s | email - %s\n", id, compName, password, email);
+				//System.out.printf("id- %d | name- %s | password - %s | email - %s\n", id, compName, password, email);
 				// company.setId(id);
 				// company.setCompName(compName);
 				// company.setPassword(password);
-				// company.setEmail(email);
+				// company.setEmail(email); 
 				return new Company(id, compName, password, email);
 			}
 		} catch (SQLException e) {
@@ -158,78 +159,75 @@ public class CompanyDBDAO implements CompanyDAO {
 		return companys;
 	}
 
-	// how to get company ID for selecting the right coupons??
 	@Override
-	public Collection<Coupon> getAllCoupons() throws Exception {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = "SELECT * from company_coupon WHERE comp_ID = ?";
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			preparedStatement.setLong(1, );
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			while (resultSet.next()) {
-				long id = resultSet.getLong("coupon_id");
-				coupons.add(couponDBDAO.getCoupon(id));
-			}
-		}
-		System.out.println();
-		connection.close();
-		return coupons;
+	public Collection<Coupon> getCoupons() throws Exception {
+		
 	}
 
-	// get all coupon ids created by company
-	public Collection<Long> getCouponsID(long wantedID) throws Exception {
-		Collection<Long> couponsID = new ArrayList<Long>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			preparedStatement.setLong(1, wantedID);
-			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				couponsID.add(resultSet.getLong("coupon_ID"));
-			}
-			connection.close();
-			return couponsID;
-		}
-	}
-	
-	//get all coupons the company created
-	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
-		Collection<Coupon> coupons = new ArrayList<Coupon>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		ResultSet resultSet;
-		String sql = "select * from coupons WHERE id = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			for (Long iLong : ids) {
-				preparedStatement.setLong(1, iLong);
-				resultSet = preparedStatement.executeQuery();
-				while (resultSet.next()) {
-					long id = resultSet.getLong("id");
-					String title = resultSet.getString("title");
-					String startDate = resultSet.getString(3);
-					String endDate = resultSet.getString(4);
-					int amount = resultSet.getInt("amount");
-					String type = resultSet.getString(6);
-					String message = resultSet.getString("message");
-					Double price = resultSet.getDouble("price");
-					String image = resultSet.getString("image");
-					Date sDate = Date.valueOf(startDate);
-					Date eDate = Date.valueOf(endDate);
-
-					coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
-				}
-			}
-			connection.close();
-			return coupons;
-		}
-	}	
+//	// get all coupon ids created by company
+//	public Collection<Long> getCouponsID(long wantedID) throws Exception {
+//		Collection<Long> couponsID = new ArrayList<Long>();
+//		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+//		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
+//		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//			preparedStatement.setLong(1, wantedID);
+//			ResultSet resultSet = preparedStatement.executeQuery();
+//			while (resultSet.next()) {
+//				couponsID.add(resultSet.getLong("coupon_ID"));
+//			}
+//			connection.close();
+//			return couponsID;
+//		}
+//	}
+//	
+//	//get all coupons the company created
+//	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
+//		Collection<Coupon> coupons = new ArrayList<Coupon>();
+//		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+//		ResultSet resultSet;
+//		String sql = "select * from coupons WHERE id = ?";
+//		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+//			for (Long iLong : ids) {
+//				preparedStatement.setLong(1, iLong);
+//				resultSet = preparedStatement.executeQuery();
+//				while (resultSet.next()) {
+//					long id = resultSet.getLong("id");
+//					String title = resultSet.getString("title");
+//					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+//					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
+//					int amount = resultSet.getInt("amount");
+//					String type = resultSet.getString(6);
+//					String message = resultSet.getString("message");
+//					Double price = resultSet.getDouble("price");
+//					String image = resultSet.getString("image");
+//		
+//					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+//				}
+//			}
+//			connection.close();
+//			return coupons;
+//		}
+//	}	
 
 	@Override
-	public boolean login(String compName, String password) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean login(String compName, String givenPassword) throws Exception {
+		boolean correctInitials = false;
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = String.format("SELECT password FROM companys WHERE comp_name = ?");
+		String password = null;
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setString(1, compName);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				password = resultSet.getString("password");
+			}
+			if (givenPassword == password ) {
+				correctInitials =  true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return correctInitials;	
 	}
 
 }

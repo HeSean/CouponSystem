@@ -1,20 +1,16 @@
 package main;
 
-import java.util.Date;
-
+import java.time.LocalDate;
 import clients.AdminFacade;
+import clients.CouponSystem;
+import clients.clientType;
 import company.Company;
-import company.CompanyFacade;
 import coupon.Coupon;
-import coupon.CouponFacade;
 import coupon.CouponType;
 import customer.Customer;
-import customer.CustomerFacade;
 
-@SuppressWarnings("unused")
 public class Test {
 
-	@SuppressWarnings({ "unused", "deprecation" })
 	public static void main(String[] args) throws Exception, IllegalAccessException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		System.out.println("Start");
@@ -33,7 +29,8 @@ public class Test {
 
 		// CompanyFacade Methods
 		// CompanyFacade companyFacade = new CompanyFacade();
-		// Company company1 = new Company("zzimz", "1234", "zzimz@gmail.com");
+		// Company company1 = new Company("Nestle", "1234", "nestle@gmail.com");
+		// company1.getCoupons();
 		// Company company2 = new Company("zzimz hapoalim", "444",
 		// "hapoalimz@gmail.com");
 		// Company company3 = new Company("alskdjalksdj", "333", "sdlfkj@gmail.com");
@@ -70,31 +67,45 @@ public class Test {
 		// couponFacade.createCoupon(coupon4);
 		// couponFacade.createCoupon(coupon3);
 		// couponFacade.getCoupon(1);
-		//couponFacade.getAllCoupons();
+		// couponFacade.getAllCoupons();
 
 		AdminFacade adminFacade = new AdminFacade();
-		//Company companyCheck = new Company("SEAn", "123", "sean@hotmail.com");
-		//adminFacade.createCompany(companyCheck);
-		//Customer customerCheck = new Customer("Sean", "12345");
-		//adminFacade.createCustomer(customerCheck);
+		Coupon coupon2 = new Coupon(5L, "Seventh Free", LocalDate.now(), LocalDate.of(2019, 10, 1), 5, CouponType.RESTAURANTS,
+				"By Nestle", 15);
+		// Company companyCheck = new Company("SEAn", "123", "sean@hotmail.com");
+		// adminFacade.createCompany(companyCheck);
+		// Customer customerCheck = new Customer("Sean", "12345");
+		// adminFacade.createCustomer(customerCheck);
 		// adminFacade.updateCompany(1, "1234", "sean@gmail.com");
 		// adminFacade.updateCustomer(1, "12347785");
-		
-		
+
+
 		clients.CompanyFacade companyFacade = new clients.CompanyFacade();
-		Coupon coupon = new Coupon	(4L,"Free drink with meal", new java.sql.Date(119, 3, 31), new java.sql.Date(119, 10, 1), 4, CouponType.FOOD, "free drink", 10);
-		//companyFacade.createCoupon(coupon);
-		//companyFacade.getCouponByType(CouponType.FOOD);
+		Company company4 = new Company(4L,"Laser Center", "1234", "lasercenter@gmail.com");
+		company4.addCoupon(coupon2);
+		
+		System.out.println(company4.getCoupons());
+		//adminFacade.createCompany(company4);
+		company4.getCoupons();
+		//companyFacade.createCoupon(coupon2, company4.getId());
 		//companyFacade.getAllCoupons();
-		//companyFacade.getCouponByPrice(10);
+
 		
-		
+
+		//companyFacade.createCoupon(coupon2, 2);
+
+		// companyFacade.getCouponByType(CouponType.FOOD);
+		// companyFacade.getAllCoupons();
+		// companyFacade.getCouponByPrice(10);
+
 		clients.CustomerFacade customerFacade = new clients.CustomerFacade();
 		Customer c2 = new Customer("Sean Hed", "1234");
-	    //customerFacade.purchaseCoupon(c2, coupon);
-		System.out.println(customerFacade.getPurchaseHistory(2));
-		System.out.println(c2.getCoupons());
-		
+		// customerFacade.purchaseCoupon(c2, coupon);
+		// System.out.println(customerFacade.getPurchaseHistory(2));
+		// System.out.println(c2.getCoupons());
+
+		// CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
+		// CouponSystem.getInstance().login("Sean Hed", "1234", clientType.CUSTOMER);
 
 		System.out.println("End");
 	}

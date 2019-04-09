@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -183,26 +184,26 @@ public class CustomerDBDAO implements CustomerDAO {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, wantedID);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			
+
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String title = resultSet.getString("title");
-				String startDate = resultSet.getString(3);
-				String endDate = resultSet.getString(4);
+				LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+				LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 				int amount = resultSet.getInt("amount");
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-				Date sDate = Date.valueOf(startDate);
-				Date eDate = Date.valueOf(endDate);
+	
 
-				coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 			}
 			connection.close();
 			return coupons;
 		}
-	}	
+	}
+
 	// get all coupons the customer purchased
 	public Collection<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
@@ -216,27 +217,41 @@ public class CustomerDBDAO implements CustomerDAO {
 				while (resultSet.next()) {
 					long id = resultSet.getLong("id");
 					String title = resultSet.getString("title");
-					String startDate = resultSet.getString(3);
-					String endDate = resultSet.getString(4);
+					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
 					int amount = resultSet.getInt("amount");
 					String type = resultSet.getString(6);
 					String message = resultSet.getString("message");
 					Double price = resultSet.getDouble("price");
 					String image = resultSet.getString("image");
-					Date sDate = Date.valueOf(startDate);
-					Date eDate = Date.valueOf(endDate);
+				
 
-					coupons.add(new Coupon(id, title, sDate, eDate, amount, type, message, price));
+					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				}
 			}
 			connection.close();
 			return coupons;
 		}
-	}	
-	@Override
-	public boolean login(String custName, String password) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
+	@Override
+	public boolean login(String custName, String givenPassword) throws SQLException {
+		boolean correctInitials = false;
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = String.format("SELECT password FROM customers WHERE cust_name = ?");
+		String password = null;
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setString(1, custName);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				password = resultSet.getString("password");
+			}
+			if (givenPassword == password) {
+				correctInitials = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return correctInitials;
+	}
 }

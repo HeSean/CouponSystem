@@ -1,13 +1,13 @@
 package coupon;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Coupon {
 	private static int COUNTER = 1;
 	private long id;
 	private String title;
-	private Date startDate;
-	private Date endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private int amount;
 	private CouponType type;
 	private String message;
@@ -18,7 +18,7 @@ public class Coupon {
 
 	}
 
-	public Coupon(String title, Date startDate, Date endDate, int amount, CouponType type, String message,
+	public Coupon(String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
 			double price) {
 		// String image) {
 		super();
@@ -32,8 +32,8 @@ public class Coupon {
 		setPrice(price);
 		setImage("null");
 	}
-	
-	public Coupon(Long id,String title, Date startDate, Date endDate, int amount, CouponType type, String message,
+
+	public Coupon(Long id, String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
 			double price) {
 		// String image) {
 		super();
@@ -48,7 +48,8 @@ public class Coupon {
 		setImage("null");
 	}
 
-	public Coupon(Long id, String title, Date sDate, Date eDate, int amount, String type, String message, Double price) {
+	public Coupon(Long id, String title, LocalDate sDate, LocalDate eDate, int amount, String type, String message,
+			Double price) {
 		super();
 		setId(id);
 		setTitle(title);
@@ -80,20 +81,20 @@ public class Coupon {
 		this.title = title;
 	}
 
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
+	}
+
+	public LocalDate getEndDate() {
+		return endDate;
 	}
 
 	public int getAmount() {

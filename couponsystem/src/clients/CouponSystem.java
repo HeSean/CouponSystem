@@ -1,7 +1,5 @@
 package clients;
 
-import java.util.Collection;
-
 import coupon.Coupon;
 import coupon.CouponDBDAO;
 import exception.EmptyException;
@@ -10,16 +8,17 @@ import main.DailyCouponExpirationTask;
 // singleton
 public class CouponSystem {
 
-	private static CouponDBDAO couponDBDAO;
-	private Collection<Coupon> coupons;
-	private static CouponSystem instance = new CouponSystem();
-	Thread update = new Thread(new DailyCouponExpirationTask(coupons));
+	private  CouponDBDAO couponDBDAO;
+	private AdminFacade adminFacade;
+	private CustomerFacade customerFacade;
+	private CompanyFacade companyFacade;
+	private static CouponSystem cSystem = new CouponSystem();
+	Thread update = new Thread(new DailyCouponExpirationTask());
 	DailyCouponExpirationTask runnable = new DailyCouponExpirationTask();
 
 	private CouponSystem() {
 		try {
 			if (!couponDBDAO.getAllCoupons().isEmpty()) {
-				coupons = couponDBDAO.getAllCoupons();
 				startCouponsUpdater();
 			} else throw new EmptyException();
 		} catch (EmptyException e) {
@@ -30,16 +29,9 @@ public class CouponSystem {
 	}
 	
 	public static CouponSystem getInstance() {
-		return instance;
-	}
-	
-	public Collection<Coupon> getCoupons() {
-		return coupons;
+		return cSystem;
 	}
 
-	public void setCoupons(Collection<Coupon> coupons) {
-		this.coupons = coupons;
-	}
 	
 	public void startCouponsUpdater() {
 		System.out.println("Starting to remove expired coupons");
@@ -56,6 +48,17 @@ public class CouponSystem {
 	
 	public void removeExpiredCoupon (Coupon coupon) throws Exception {
 		couponDBDAO.removeCoupon(coupon);
+	}
+	
+	public void login(String name, String password, clientType type) throws Exception {
+			switch(type) {
+			case ADMINISTRATOR:
+			   adminFacade.login(name, password, type);
+			case CUSTOMER:
+			    customerFacade.login(name, password, type);
+			case COMPANY:
+				companyFacade.login(name, password, type);
+			}
 	}
 
 

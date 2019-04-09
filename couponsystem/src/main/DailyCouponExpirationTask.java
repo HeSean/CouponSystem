@@ -1,5 +1,6 @@
 package main;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 
@@ -37,7 +38,7 @@ public class DailyCouponExpirationTask implements Runnable {
 		while (running) {
 			if (!coupons.isEmpty()) {
 				for (Coupon coupon : coupons) {
-					if (coupon.getEndDate().after(new Date())) {
+					if (coupon.getEndDate().isAfter(LocalDate.now())) {
 						try {
 							CouponSystem.getInstance().removeExpiredCoupon(coupon);
 						} catch (Exception e1) {
