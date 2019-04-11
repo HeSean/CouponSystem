@@ -50,14 +50,16 @@ public class CouponSystem {
 		couponDBDAO.removeCoupon(coupon);
 	}
 	
-	public void login(String name, String password, clientType type) throws Exception {
+	public CouponClientFacade login(String name, String password, clientType type) throws Exception {
 			switch(type) {
 			case ADMINISTRATOR:
-			   adminFacade.login(name, password, type);
+			   return adminFacade.login(name, password, type);
 			case CUSTOMER:
-			    customerFacade.login(name, password, type);
+			   return  customerFacade.login(name, password, type);
 			case COMPANY:
-				companyFacade.login(name, password, type);
+				return companyFacade.login(name, password, type);
+				default: 
+					return null;
 			}
 	}
 

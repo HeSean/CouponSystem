@@ -16,7 +16,7 @@ public class AdminFacade implements CouponClientFacade {
 		if (name.equals("admin") && password.equals("1234")) {
 			System.out.println("Welcome admin.");
 		}
-		return null;
+		return new AdminFacade();
 	}
 
 	public AdminFacade() {

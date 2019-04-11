@@ -161,7 +161,7 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-		
+			
 	}
 
 //	// get all coupon ids created by company

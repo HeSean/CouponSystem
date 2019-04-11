@@ -49,15 +49,32 @@ public class CouponDBDAO implements CouponDAO {
 	}
 	
 	// insert new created coupon to company-coupon table
-	public void insertCouponToJoinTable (long couponID, long compID) throws Exception {
+	public void insertCouponToCompanysCouponJoinTable (long couponID, long compID) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sqlCompanyCoupon = "INSERT INTO company_coupon (comp_ID, coupon_ID) VALUES (?,?)";
+		String sqlCompanyCoupon = "INSERT INTO companys_coupon (company_id, coupon_id) VALUES (?,?)";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
 			preparedStatement.setLong(1, compID);
 			preparedStatement.setLong(2, couponID);
 			preparedStatement.executeUpdate();
 			System.out.println("\nNew coupon submit into Company - Coupon table succeeded.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			connection.close();
+		}
+	}
+	
+	// insert new created coupon to company-coupon table
+	public void insertCouponToCustomersCouponJoinTable (long couponID, long custID) throws Exception {
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sqlCustomerCoupon = "INSERT INTO customers_coupon (customer_id, coupon_id) VALUES (?,?)";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCustomerCoupon,
+				PreparedStatement.RETURN_GENERATED_KEYS);) {
+			preparedStatement.setLong(1, custID);
+			preparedStatement.setLong(2, couponID);
+			preparedStatement.executeUpdate();
+			System.out.println("\nNew coupon submit into Customer - Coupon table succeeded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

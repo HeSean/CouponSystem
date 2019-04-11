@@ -1,6 +1,7 @@
 package exception;
 
 import company.Company;
+import coupon.Coupon;
 import customer.Customer;
 
 public class NameExistsException extends Exception {
@@ -15,6 +16,9 @@ public class NameExistsException extends Exception {
 		this.object = object;
 	}
 
+	public NameExistsException(String name) {
+		setName(name);
+	}
 	public String getName() {
 		return name;
 	}
@@ -31,8 +35,12 @@ public class NameExistsException extends Exception {
 		} else if (object instanceof Customer) {
 			return " \nNameExistsException of Customer Name - \"" + name
 					+ "\". There is already a customer with that name, Please try again with a different name.";
-		} else return " \nNameExistsException of Coupon Title - \"" + name
+		} else if (object instanceof Coupon) {
+			return " \nNameExistsException of Coupon Title - \"" + name
 				+ "\". There is already a coupon with that name, Please try again with a different name.";
+		}
+		else return " \nNameExistsException of " + name
+				+ "\". There is already a " + name + " with that name, Please try again with a different name.";
 		
 	}
 }

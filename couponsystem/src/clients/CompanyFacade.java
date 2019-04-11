@@ -24,7 +24,7 @@ public class CompanyFacade implements CouponClientFacade {
 			if (!couponDBDAO.checkCouponName(coupon)) {
 				couponDBDAO.createCoupon(coupon);
 				Company company = companyDBDAO.getCompany(compID);
-				couponDBDAO.insertCouponToJoinTable(coupon.getId(), compID);
+				couponDBDAO.insertCouponToCompanysCouponJoinTable(coupon.getId(), compID);
 				company.addCoupon(coupon);
 			} else
 				throw new NameExistsException(coupon.getTitle(), coupon);
@@ -47,8 +47,8 @@ public class CompanyFacade implements CouponClientFacade {
 		return couponDBDAO.getCoupon(id);
 	}
 
-	 public Collection<Coupon> getAllCoupons() throws Exception {
-		 
+	 public Collection<Coupon> getAllCoupon() throws Exception {
+		 return couponDBDAO.getAllCoupons();
 	 }
 
 	public Collection<Coupon> getCouponByType(CouponType cType) throws Exception {
