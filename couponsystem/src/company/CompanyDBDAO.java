@@ -15,6 +15,8 @@ import coupon.CouponDBDAO;
 
 public class CompanyDBDAO implements CompanyDAO {
 
+	private Company company;
+	private long companyID = 0;
 	CouponDBDAO couponDBDAO = new CouponDBDAO();
 
 	public CompanyDBDAO() {
@@ -123,11 +125,12 @@ public class CompanyDBDAO implements CompanyDAO {
 				String compName = resultSet.getString("comp_Name");
 				String password = resultSet.getString("password");
 				String email = resultSet.getString("email");
-				//System.out.printf("id- %d | name- %s | password - %s | email - %s\n", id, compName, password, email);
+				// System.out.printf("id- %d | name- %s | password - %s | email - %s\n", id,
+				// compName, password, email);
 				// company.setId(id);
 				// company.setCompName(compName);
 				// company.setPassword(password);
-				// company.setEmail(email); 
+				// company.setEmail(email);
 				return new Company(id, compName, password, email);
 			}
 		} catch (SQLException e) {
@@ -161,53 +164,78 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-			
+			return null;
 	}
 
-//	// get all coupon ids created by company
-//	public Collection<Long> getCouponsID(long wantedID) throws Exception {
-//		Collection<Long> couponsID = new ArrayList<Long>();
-//		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-//		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
-//		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-//			preparedStatement.setLong(1, wantedID);
-//			ResultSet resultSet = preparedStatement.executeQuery();
-//			while (resultSet.next()) {
-//				couponsID.add(resultSet.getLong("coupon_ID"));
-//			}
-//			connection.close();
-//			return couponsID;
-//		}
-//	}
-//	
-//	//get all coupons the company created
-//	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
-//		Collection<Coupon> coupons = new ArrayList<Coupon>();
-//		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-//		ResultSet resultSet;
-//		String sql = "select * from coupons WHERE id = ?";
-//		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-//			for (Long iLong : ids) {
-//				preparedStatement.setLong(1, iLong);
-//				resultSet = preparedStatement.executeQuery();
-//				while (resultSet.next()) {
-//					long id = resultSet.getLong("id");
-//					String title = resultSet.getString("title");
-//					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
-//					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
-//					int amount = resultSet.getInt("amount");
-//					String type = resultSet.getString(6);
-//					String message = resultSet.getString("message");
-//					Double price = resultSet.getDouble("price");
-//					String image = resultSet.getString("image");
-//		
-//					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
-//				}
-//			}
-//			connection.close();
-//			return coupons;
-//		}
-//	}	
+	public Company getCompany(String name) throws Exception {
+		Company company = new Company();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = String.format("SELECT id, comp_name, password, email FROM companys WHERE comp_name=?");
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setString(1, name);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				company.setId(resultSet.getLong("id"));
+				company.setCompName(resultSet.getString("comp_Name"));
+				company.setPassword(resultSet.getString("password"));
+				company.setEmail(resultSet.getString("email"));
+				company.setCoupons((ArrayList<Coupon>) getCompanyCoupons(company));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return company;
+	}
+
+	public Collection<Coupon> getCompanyCoupons(Company comapny) throws Exception {
+		Collection<Long> couponsID = getCouponsID(comapny);
+		return getCoupons(couponsID);
+	}
+
+	// get all coupon ids created by company
+	public Collection<Long> getCouponsID(Company company) throws Exception {
+		Collection<Long> couponsID = new ArrayList<Long>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, company.getId());
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				couponsID.add(resultSet.getLong("coupon_ID"));
+			}
+			connection.close();
+			return couponsID;
+		}
+	}
+
+	// get all coupons the company created
+	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
+		Collection<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		ResultSet resultSet;
+		String sql = "select * from coupons WHERE id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			for (Long iLong : ids) {
+				preparedStatement.setLong(1, iLong);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					long id = resultSet.getLong("id");
+					String title = resultSet.getString("title");
+					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
+					int amount = resultSet.getInt("amount");
+					String type = resultSet.getString(6);
+					String message = resultSet.getString("message");
+					Double price = resultSet.getDouble("price");
+					String image = resultSet.getString("image");
+
+					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				}
+			}
+			connection.close();
+			return coupons;
+		}
+	}
 
 	@Override
 	public boolean login(String compName, String givenPassword) throws Exception {
@@ -218,16 +246,17 @@ public class CompanyDBDAO implements CompanyDAO {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, compName);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				password = resultSet.getString("password");
-			}
-			if (givenPassword == password ) {
-				correctInitials =  true;
+			password = resultSet.getString("password");
+			// while (resultSet.next()) {
+			// password = resultSet.getString("password");
+			// }
+			if (givenPassword == password) {
+				correctInitials = true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return correctInitials;	
+		return correctInitials;
 	}
 
 }

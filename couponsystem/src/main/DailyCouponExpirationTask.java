@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 
-import clients.CouponSystem;
 import coupon.Coupon;
 
 public class DailyCouponExpirationTask implements Runnable {

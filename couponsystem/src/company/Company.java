@@ -12,21 +12,23 @@ public class Company {
 	private String email;
 	private Collection<Coupon> coupons = new ArrayList<Coupon>();
 
+	//empty ctor
 	public Company() {
 
 	}
-	
-	public Company (long id, String compName, String email) {
-		setId(id);
+
+	//first creation ctor
+	public Company(String compName, String password, String email) {
+		super();
+		setId(COUNTER++);
 		setCompName(compName);
+		setPassword(password);
 		setEmail(email);
 	}
 
-	public Company(String compName, String password, String email) {
-		super();
-		setId(++COUNTER);
+	public Company(long id, String compName, String email) {
+		setId(id);
 		setCompName(compName);
-		setPassword(password);
 		setEmail(email);
 	}
 
@@ -72,19 +74,19 @@ public class Company {
 	public Collection<Coupon> getCoupons() {
 		return this.coupons;
 	}
-	
+
+	public void setCoupons(ArrayList<Coupon> coupons) {
+		this.coupons = coupons;
+	}
+
 	public void addCoupon(Coupon coupon) {
 		this.coupons.add(coupon);
 	}
 
-
 	@Override
 	public String toString() {
-		return "Company [ ID = " + id + " | Company Name = " + compName + " | Password = " + password + "| Email Address = " + email+ " | Available Coupons = " + coupons
-				+ "]";
+		return "Company [ ID = " + id + " | Company Name = " + compName + " | Password = " + password
+				+ "| Email Address = " + email + " | Available Coupons = " + coupons + "]";
 	}
-
-	
-
 
 }

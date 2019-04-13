@@ -25,7 +25,7 @@ public class Database {
 				+ "		\"TRAVELLING\"), message varchar(45), price double, image varchar(45));";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Coupon table succesfully created.");
 			} else
 				throw new NameExistsException("Coupon Table");
@@ -39,7 +39,7 @@ public class Database {
 		String sql = "CREATE TABLE if not exists Customers (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , cust_name varchar(45), password varchar(45));";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customer table succesfully created.");
 			} else
 				throw new NameExistsException("Customer Table");
@@ -53,7 +53,7 @@ public class Database {
 		String sql = "CREATE TABLE if not exists companys (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , comp_name varchar(45), password varchar(45), email varchar(45));";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Companys table succesfully created.");
 			} else
 				throw new NameExistsException("Companys Table");
@@ -64,13 +64,13 @@ public class Database {
 
 	public void createCustomerCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists customers_coupon (\r\n" + "customer_id int NOT NULL PRIMARY KEY,\r\n"
-				+ "coupon_id int NOT NULL PRIMARY KEY,    \r\n"
+		String sql = "CREATE TABLE if not exists customers_coupon (\r\n" + "customer_id int NOT NULL ,\r\n"
+				+ "coupon_id int NOT NULL PRIMARY KEY ,    \r\n"
 				+ "FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n"
 				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade\r\n" + ");";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customer - Coupon table succesfully created.");
 			} else
 				throw new NameExistsException("Customer - Coupon Table");
@@ -81,13 +81,13 @@ public class Database {
 
 	public void createCompanysCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists companys_coupon (\r\n" + "company_id int NOT NULL PRIMARY KEY,\r\n"
-				+ "coupon_id int NOT NULL PRIMARY KEY,    \r\n"
+		String sql = "CREATE TABLE if not exists companys_coupon (\r\n" + "company_id int NOT NULL ,\r\n"
+				+ "coupon_id int NOT NULL PRIMARY KEY ,    \r\n"
 				+ "FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n"
 				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade\r\n" + ");";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Company - Coupon table succesfully created.");
 			} else
 				throw new NameExistsException("Company - Coupon Table");
@@ -102,7 +102,7 @@ public class Database {
 		String sql = "DROP table if exists Coupons";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Coupon table succesfully dropped.");
 			} else
 				throw new EmptyException("Coupon Table");
@@ -114,9 +114,8 @@ public class Database {
 	public void dropCustomersTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
 		String sql = "DROP table if exists Customers";
-
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customers table succesfully dropped.");
 			} else
 				throw new EmptyException("Customer Table");
@@ -130,7 +129,7 @@ public class Database {
 		String sql = "DROP table if exists Companys";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Companys table succesfully dropped.");
 			} else
 				throw new EmptyException("Companys Table");
@@ -141,10 +140,10 @@ public class Database {
 
 	public void dropCompanyCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Company_Coupon";
+		String sql = "DROP table if exists Companys_Coupon";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Company_Coupon table succesfully dropped.");
 			} else
 				throw new EmptyException("Company_Coupon Table");
@@ -155,10 +154,10 @@ public class Database {
 
 	public void dropCustomerCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Customer_Coupon";
+		String sql = "DROP table if exists Customers_Coupon";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() != 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customer_Coupon table succesfully dropped.");
 			} else
 				throw new EmptyException("Customer_Coupon Table");

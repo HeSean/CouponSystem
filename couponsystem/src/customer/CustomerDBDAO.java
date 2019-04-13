@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import coupon.Coupon;
 import coupon.CouponDBDAO;
+import coupon.CouponType;
 
 public class CustomerDBDAO implements CustomerDAO {
 
@@ -111,7 +112,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	@Override
-	public Customer getCustomer(long id) throws SQLException {
+	public Customer getCustomer(long id) throws Exception {
 		Customer wantedCustomer = new Customer();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("SELECT cust_Name, password FROM customers WHERE id=?");
@@ -119,14 +120,36 @@ public class CustomerDBDAO implements CustomerDAO {
 			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-
 				String custName = resultSet.getString("cust_name");
 				String password = resultSet.getString("password");
-				// System.out.printf("id- %d | name- %s | password - %s ", id, custName,
-				// password);
 				wantedCustomer.setId(id);
 				wantedCustomer.setCustName(custName);
 				wantedCustomer.setPassword(password);
+				wantedCustomer.setCoupons((ArrayList<Coupon>) getCoupons((ArrayList<Long>) getCouponsID(id)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			connection.close();
+		}
+		return wantedCustomer;
+	}
+	
+	public Customer getCustomer(String name) throws Exception {
+		Customer wantedCustomer = new Customer();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = String.format("SELECT * FROM customers WHERE cust_name=?");
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setString(1, name);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				long id = resultSet.getLong("id");
+				String custName = resultSet.getString("cust_name");
+				String password = resultSet.getString("password");
+				wantedCustomer.setId(id);
+				wantedCustomer.setCustName(custName);
+				wantedCustomer.setPassword(password);
+				wantedCustomer.setCoupons((ArrayList<Coupon>) getCoupons((ArrayList<Long>) getCouponsID(id)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -138,7 +161,6 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public Collection<Customer> getAllCustomers() throws SQLException {
-		// TODO Auto-generated method stub
 		ArrayList<Customer> customers = new ArrayList<Customer>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		Statement statement = connection.createStatement();
@@ -148,8 +170,6 @@ public class CustomerDBDAO implements CustomerDAO {
 		ResultSet resultSet = statement.executeQuery(sql);
 
 		while (resultSet.next()) {
-
-			// int id = resultSet.getInt(1);
 			long id = resultSet.getLong("id");
 			String custName = resultSet.getString("cust_Name");
 			customers.add(new Customer(id, custName));
@@ -163,7 +183,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	public Collection<Long> getCouponsID(long wantedID) throws Exception {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = "SELECT coupon_ID from customer_coupon WHERE cust_ID = ?";
+		String sql = "SELECT coupon_ID from customers_coupon WHERE customer_ID = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, wantedID);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -174,16 +194,22 @@ public class CustomerDBDAO implements CustomerDAO {
 			return couponsID;
 		}
 	}
+	
 
 	@Override
 	public Collection<Coupon> getAllCoupons(long wantedID) throws Exception {
+		ArrayList<Long> couponsID = new ArrayList<Long>();
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 
-		String sql = "select * from customer_coupon WHERE cust_id = ?";
+		String sql = "select * from customer_coupon WHERE customer_id = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, wantedID);
 			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				couponsID.add(resultSet.getLong("coupon_id"));
+			}
+		
 
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
@@ -238,7 +264,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	public boolean login(String custName, String givenPassword) throws SQLException {
 		boolean correctInitials = false;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format("SELECT password FROM customers WHERE cust_name = ?");
+		String sql = String.format("SELECT id, cust_name, password FROM customers WHERE cust_name = ?");
 		String password = null;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, custName);
@@ -246,7 +272,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			while (resultSet.next()) {
 				password = resultSet.getString("password");
 			}
-			if (givenPassword == password) {
+			if (givenPassword.equals(password)) {
 				correctInitials = true;
 			}
 		} catch (SQLException e) {

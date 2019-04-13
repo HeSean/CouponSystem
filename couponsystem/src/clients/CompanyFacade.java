@@ -1,5 +1,6 @@
 package clients;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import company.Company;
@@ -8,6 +9,7 @@ import coupon.Coupon;
 import coupon.CouponDBDAO;
 import coupon.CouponType;
 import exception.NameExistsException;
+import main.clientType;
 
 public class CompanyFacade implements CouponClientFacade {
 
@@ -52,20 +54,32 @@ public class CompanyFacade implements CouponClientFacade {
 	 }
 
 	public Collection<Coupon> getCouponByType(CouponType cType) throws Exception {
+		System.out.println("Coupons from type " + cType + " are:");
 		Collection<Coupon> coupons = couponDBDAO.getCouponByType(cType);
 		if (!coupons.isEmpty()) {
 			return coupons;
 		} else
-			System.out.println("No coupons were found under that price - " + cType);
+			System.out.println("No coupons were found from type - " + cType);
 		return null;
 	}
 
 	public Collection<Coupon> getCouponByPrice(double price) throws Exception {
+		System.out.println("Coupons under " + price + "$ price are:");
 		Collection<Coupon> coupons = couponDBDAO.getCouponByPrice(price);
 		if (!coupons.isEmpty()) {
 			return coupons;
 		} else
 			System.out.println("No coupons were found under that price - " + price);
+		return null;
+	}
+	
+	public Collection<Coupon> getCouponByDate(LocalDate localDate) throws Exception {
+		System.out.println("Available coupons by given date - "+ localDate + " are:");
+		Collection<Coupon> coupons = couponDBDAO.getCouponByDate(localDate);
+		if (!coupons.isEmpty()) {
+			return coupons;
+		} else
+			System.out.println("No available coupons were found in the system to expire before  - " + localDate);
 		return null;
 	}
 
@@ -79,9 +93,8 @@ public class CompanyFacade implements CouponClientFacade {
 
 	@Override
 	public CompanyFacade login(String name, String password, clientType c) throws Exception {
-		CompanyFacade companyFacade = new CompanyFacade();
 		if (companyDBDAO.login(name, password)) {
-			return companyFacade;
+			return this;
 		} else
 			return null;
 	}

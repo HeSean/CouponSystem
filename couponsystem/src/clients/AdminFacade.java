@@ -1,30 +1,40 @@
 package clients;
 
+import java.sql.SQLException;
+
 import company.Company;
 import company.CompanyDBDAO;
+import coupon.CouponDBDAO;
 import customer.Customer;
 import customer.CustomerDBDAO;
-import exception.NameExistsException;;
+import exception.NameExistsException;
+import main.clientType;;
 
 public class AdminFacade implements CouponClientFacade {
 
-	CompanyDBDAO companyDBDAO = new CompanyDBDAO();
-	CustomerDBDAO customerDBDAO = new CustomerDBDAO();
+	private static final String ADMINUSER = "admin";
+	private static final String ADMINPASSWORD = "1234";
+	private CompanyDBDAO companyDBDAO;
+	private CustomerDBDAO customerDBDAO;
+	private CouponDBDAO couponDBDAO;
 
+	public AdminFacade() throws Exception {
+		companyDBDAO = new CompanyDBDAO();
+		customerDBDAO = new CustomerDBDAO();
+	}
+	
 	@Override
 	public  CouponClientFacade login(String name, String password, clientType c) throws Exception {
-		if (name.equals("admin") && password.equals("1234")) {
+		if (ADMINUSER.equals(name) && ADMINPASSWORD.equals(password)) {
 			System.out.println("Welcome admin.");
-		}
-		return new AdminFacade();
-	}
-
-	public AdminFacade() {
-		// TODO Auto-generated constructor stub
+			return this;
+		} else 
+			return null;
 	}
 
 	// Company Methods
 	public void createCompany(Company company) throws NameExistsException {
+		// missing check for password and name to be req
 		try {
 			if (!companyDBDAO.checkCompanyName(company)) {
 				companyDBDAO.createCompany(company);

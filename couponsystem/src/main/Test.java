@@ -2,8 +2,6 @@ package main;
 
 import java.time.LocalDate;
 import clients.AdminFacade;
-import clients.CouponSystem;
-import clients.clientType;
 import company.Company;
 import coupon.Coupon;
 import coupon.CouponType;
@@ -70,8 +68,7 @@ public class Test {
 		// couponFacade.getAllCoupons();
 
 		AdminFacade adminFacade = new AdminFacade();
-		Coupon coupon2 = new Coupon(5L, "Seventh Free", LocalDate.now(), LocalDate.of(2019, 10, 1), 5, CouponType.RESTAURANTS,
-				"By Nestle", 15);
+		//Coupon coupon2 = new Coupon(5L, "Seventh Free", LocalDate.now(), LocalDate.of(2019, 10, 1), 5, CouponType.RESTAURANTS, "By Nestle", 15);
 		// Company companyCheck = new Company("SEAn", "123", "sean@hotmail.com");
 		// adminFacade.createCompany(companyCheck);
 		// Customer customerCheck = new Customer("Sean", "12345");
@@ -81,12 +78,12 @@ public class Test {
 
 
 		clients.CompanyFacade companyFacade = new clients.CompanyFacade();
-		Company company4 = new Company(4L,"Laser Center", "1234", "lasercenter@gmail.com");
-		company4.addCoupon(coupon2);
+		//Company company4 = new Company(4L,"Laser Center", "1234", "lasercenter@gmail.com");
+		//company4.addCoupon(coupon2);
 		
-		System.out.println(company4.getCoupons());
+		//System.out.println(company4.getCoupons());
 		//adminFacade.createCompany(company4);
-		company4.getCoupons();
+		//company4.getCoupons();
 		//companyFacade.createCoupon(coupon2, company4.getId());
 		//companyFacade.getAllCoupons();
 
@@ -104,8 +101,10 @@ public class Test {
 		// System.out.println(customerFacade.getPurchaseHistory(2));
 		// System.out.println(c2.getCoupons());
 
-		// CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
-		// CouponSystem.getInstance().login("Sean Hed", "1234", clientType.CUSTOMER);
+		//CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
+		//CouponSystem.getInstance().login("Sean Hed", "1234", clientType.CUSTOMER);
+		
+		
 
 		System.out.println("End");
 	}

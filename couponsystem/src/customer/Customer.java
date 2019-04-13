@@ -10,7 +10,7 @@ public class Customer {
 	private long id;
 	private String custName;
 	private String password;
-	private ArrayList<Coupon> coupons;
+	private ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 	
 	public Customer() {
 		
@@ -27,7 +27,7 @@ public class Customer {
 
 	public Customer(String custName, String password) {
 		super();
-		setId(++COUNTER);
+		setId(COUNTER++);
 		setCustName(custName);
 		setPassword(password);
 	}
@@ -57,13 +57,15 @@ public class Customer {
 	}
 	
 	public ArrayList<Coupon> getCoupons() {
-		System.out.println(coupons);
-		return coupons;
-		
+		return this.coupons;	
+	}
+	
+	public void setCoupons(ArrayList<Coupon> coupons) {
+		this.coupons = coupons;
 	}
 	
 	public void addCoupon(Coupon coupon) {
-		coupons.add(coupon);
+		this.coupons.add(coupon);
 	}
 	
 

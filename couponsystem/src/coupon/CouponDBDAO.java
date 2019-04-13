@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,11 +24,10 @@ public class CouponDBDAO implements CouponDAO {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format(
 				"INSERT INTO coupons (id, title, start_Date, end_Date, amount, type, message, price, image) VALUES (?,?,?,?,?,?,?,?,?)");
-		
-		
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
-			
+
 			preparedStatement.setLong(1, coupon.getId());
 			preparedStatement.setString(2, coupon.getTitle());
 			preparedStatement.setDate(3, Date.valueOf(coupon.getStartDate()));
@@ -47,9 +47,9 @@ public class CouponDBDAO implements CouponDAO {
 			connection.close();
 		}
 	}
-	
+
 	// insert new created coupon to company-coupon table
-	public void insertCouponToCompanysCouponJoinTable (long couponID, long compID) throws Exception {
+	public void insertCouponToCompanysCouponJoinTable(long couponID, long compID) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sqlCompanyCoupon = "INSERT INTO companys_coupon (company_id, coupon_id) VALUES (?,?)";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
@@ -64,9 +64,9 @@ public class CouponDBDAO implements CouponDAO {
 			connection.close();
 		}
 	}
-	
+
 	// insert new created coupon to company-coupon table
-	public void insertCouponToCustomersCouponJoinTable (long couponID, long custID) throws Exception {
+	public void insertCouponToCustomersCouponJoinTable(long couponID, long custID) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sqlCustomerCoupon = "INSERT INTO customers_coupon (customer_id, coupon_id) VALUES (?,?)";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCustomerCoupon,
@@ -107,14 +107,14 @@ public class CouponDBDAO implements CouponDAO {
 	public void removeCoupon(Coupon coupon) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String couponsSQL = String.format("delete from coupons where id=?");
-		String couponsCustomerSQL = String.format("delete * customer_coupon where coupon_ID=?");
-		String couponsCompanySQL = String.format("delete * company_coupon where coupon_ID=?");
+		String couponsCustomerSQL = String.format("delete from customers_coupon where coupon_ID=?");
+		String couponsCompanySQL = String.format("delete from companys_coupon where coupon_ID=?");
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, coupon.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from coupons Table");
+			System.out.println("Delete succesful from Coupons Table");
 
 			preparedStatement = connection.prepareStatement(couponsCustomerSQL);
 			connection.setAutoCommit(false);
@@ -253,7 +253,6 @@ public class CouponDBDAO implements CouponDAO {
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-			
 
 				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				System.out.printf(
@@ -283,7 +282,6 @@ public class CouponDBDAO implements CouponDAO {
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
-	
 
 				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				System.out.printf(
@@ -294,7 +292,41 @@ public class CouponDBDAO implements CouponDAO {
 			return coupons;
 		}
 	}
-	// can the wanted coupon be bought? 1 = yes, 2 = customer has already bought a similar coupon, 3 = no coupons left in stock (amont <= 0), 4 = coupon expired.
+	
+	public Collection<Coupon> getCouponByDate(LocalDate wantedDate) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		String sql = "select * from coupons WHERE end_Date > ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			Date date = Date.valueOf(wantedDate);
+			preparedStatement.setDate(1, date);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				long id = resultSet.getLong("id");
+				String title = resultSet.getString("title");
+				LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+				LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
+				int amount = resultSet.getInt("amount");
+				String type = resultSet.getString(6);
+				String message = resultSet.getString("message");
+				Double price = resultSet.getDouble("price");
+				String image = resultSet.getString("image");
+
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				System.out.printf(
+						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
+						id, title, startDate, endDate, amount, type, message, price, image);
+			}
+			connection.close();
+			return coupons;
+		}
+	}
+
+	// can the wanted coupon be bought?
+	// 1 = yes
+	// 2 = no coupons left in stock (amount <= 0)
+	// 3 = coupon expired.
 	public int canBuy(Customer customer, Coupon coupon) throws Exception {
 		// boolean isOkayToBuy = true;
 		int msg = 1;
@@ -311,55 +343,24 @@ public class CouponDBDAO implements CouponDAO {
 			}
 			Date eDate = Date.valueOf(endDate);
 			// System.out.println("Amount " + amount + "\nEnd Date " + eDate);
-			// 1. verify the client hasnt purchased a SIMILAR coupon before
-			if (hasAlreadyBought(customer, coupon)) {
+			// verify coupon amount > 0
+			if (amount <= 0) {
 				// isOkayToBuy = false;
 				msg = 2;
 			}
-			// 2. verify coupon amount > 0
-			if (amount <= 0) {
-				// isOkayToBuy = false;
-				msg = 3;
-			}
-			// 3. verify coupon hasnt expired
+			//  verify coupon hasnt expired
 			if (eDate.before(new java.util.Date())) {
 				// isOkayToBuy = false;
-				msg = 4;
+				msg = 3;
 			}
 			return msg;
 		}
 	}
-	
-	// did the customer already purchase a coupon like this? false for no and true for yes
-		public boolean hasAlreadyBought(Customer customer, Coupon coupon) throws Exception {
-			boolean boughtOnce = false;
-			ArrayList<Long> couponsID = new ArrayList<Long>();
-			Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-			String sql = "select * from customer_coupon WHERE cust_ID = ?";
-			try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-				preparedStatement.setLong(1, customer.getId());
-				ResultSet resultSet = preparedStatement.executeQuery();
-				while (resultSet.next()) {
-					long id = resultSet.getLong("coupon_ID");
-					couponsID.add(id);
-				}
-				for (Long couponID : couponsID) {
-					if (couponID == coupon.getId()) {
-						boughtOnce = true;
-					}
-				}
-			} catch (Exception e) {
-				System.out.println("no coupons were bought by any customer.");
-			} finally {
-				connection.close();
-			}
-			return boughtOnce;
-		}
 
 	// purchasing coupon
 	public void purchaseCoupon(Customer customer, Coupon coupon) throws Exception {
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format("INSERT INTO customer_coupon (cust_ID, coupon_ID) VALUES (?,?)");
+		String sql = String.format("INSERT INTO customers_coupon (customer_ID, coupon_ID) VALUES (?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
 			preparedStatement.setLong(1, customer.getId());
@@ -370,6 +371,8 @@ public class CouponDBDAO implements CouponDAO {
 			System.out.println("Purchased coupon succesfully. Customer " + customer.getCustName() + " bought coupon - "
 					+ coupon.getTitle());
 			customer.addCoupon(coupon);
+		}catch (SQLIntegrityConstraintViolationException e) {
+			System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
