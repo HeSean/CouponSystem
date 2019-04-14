@@ -56,7 +56,7 @@ public class CouponDBDAO implements CouponDAO {
 		if (boughtCoupon.getAmount() > 0) {
 			int newAmount = boughtCoupon.getAmount() - 1;
 			Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-			String sql = String.format("UPDATE coupons set amount = ? WHERE id = ?");
+			String sql = String.format("UPDATE coupons SET amount = amount - 1 WHERE id = ?");
 			try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 				connection.setAutoCommit(false);
 				preparedStatement.setInt(1, newAmount);
@@ -438,9 +438,7 @@ public class CouponDBDAO implements CouponDAO {
 		String sql = String.format("INSERT INTO customers_coupon (customer_ID, coupon_ID) VALUES (?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
-			//preparedStatement.setLong(1, customer.getId());
-			preparedStatement.setLong(1, 3);
-
+			preparedStatement.setLong(1, customer.getId());
 			preparedStatement.setLong(2, coupon.getId());
 			preparedStatement.executeUpdate();
 			ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -449,10 +447,9 @@ public class CouponDBDAO implements CouponDAO {
 					+ coupon.getTitle());
 			customer.addCoupon(coupon);
 			deleteFromStockDB(coupon);
-			deleteFromStockJB(coupon);
+			//deleteFromStockJB(coupon);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			System.out.println(e);
-			//System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
+			System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

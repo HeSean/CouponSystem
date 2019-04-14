@@ -87,19 +87,24 @@ public class Testing {
 		// companyFacade.login("Japanika", "1234", clientType.COMPANY);
 		// companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
 		// System.out.println(companyFacade.getAllCoupon());
-		// company facade is able to override logins but not customer facade - stuck
+		// facades are able to override logins but not purchase coupon method - stuck
 		// with same id when trying to buy coupon
 
 
 		
-		customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
-		System.out.println(customerFacade.getCouponsPurchaseHistory());
+		//customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
+		//System.out.println(customerFacade.getCouponsPurchaseHistory());
 
 		// customerFacade.purchaseCoupon(customer3, coupon1);
 
-		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
+		//customerFacade.login("Sean", "1234", clientType.CUSTOMER);
+		
+		
+		customerFacade.login("Michael", "1234", clientType.CUSTOMER);
 		System.out.println(customerFacade.getCouponsPurchaseHistory());
-		customerFacade.purchaseCoupon(customer1, coupon1);
+
+		customerFacade.purchaseCoupon(customer2, coupon1);
+		System.out.println(customerFacade.getCouponsPurchaseHistory());
 
 		System.out.println("End.");
 	}
