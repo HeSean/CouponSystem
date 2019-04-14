@@ -438,7 +438,9 @@ public class CouponDBDAO implements CouponDAO {
 		String sql = String.format("INSERT INTO customers_coupon (customer_ID, coupon_ID) VALUES (?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
-			preparedStatement.setLong(1, customer.getId());
+			//preparedStatement.setLong(1, customer.getId());
+			preparedStatement.setLong(1, 3);
+
 			preparedStatement.setLong(2, coupon.getId());
 			preparedStatement.executeUpdate();
 			ResultSet resultSet = preparedStatement.getGeneratedKeys();
@@ -449,7 +451,8 @@ public class CouponDBDAO implements CouponDAO {
 			deleteFromStockDB(coupon);
 			deleteFromStockJB(coupon);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
+			System.out.println(e);
+			//System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

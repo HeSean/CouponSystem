@@ -64,10 +64,14 @@ public class Database {
 
 	public void createCustomerCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists customers_coupon (\r\n" + "customer_id int NOT NULL ,\r\n"
-				+ "coupon_id int NOT NULL PRIMARY KEY ,    \r\n"
-				+ "FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n"
-				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade\r\n" + ");";
+		String sql = "\r\n" + 
+				"CREATE TABLE if not exists customers_coupon (\r\n" + 
+				"customer_id int NOT NULL ,\r\n" + 
+				"coupon_id int NOT NULL ,    \r\n" + 
+				"FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n" + 
+				"FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n" + 
+				"primary key (customer_id, coupon_id)\r\n" + 
+				");";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			if (preparedStatement.executeUpdate() == 0) {
@@ -81,10 +85,13 @@ public class Database {
 
 	public void createCompanysCouponTable() throws Exception {
 		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists companys_coupon (\r\n" + "company_id int NOT NULL ,\r\n"
-				+ "coupon_id int NOT NULL PRIMARY KEY ,    \r\n"
-				+ "FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n"
-				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade\r\n" + ");";
+		String sql = "CREATE TABLE if not exists companys_coupon (\r\n" + 
+				"company_id int NOT NULL ,\r\n" + 
+				"coupon_id int NOT NULL,    \r\n" + 
+				"FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n" + 
+				"FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n" + 
+				"primary key (company_id, coupon_id)\r\n" + 
+				");";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			if (preparedStatement.executeUpdate() == 0) {

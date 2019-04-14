@@ -58,6 +58,12 @@ public class CustomerFacade implements CouponClientFacade {
 		}
 	}
 
+	public Collection<Coupon> getCouponsPurchaseHistory() throws Exception {
+		ArrayList<Long> couponsID = customerDBDAO.getCouponsID(customer.getId());
+		return customerDBDAO.getCoupons(couponsID);
+	}
+	
+	
 	// get customers entire purchase history
 	public Collection<Coupon> getAllPurchasedHistory(long id) throws Exception {
 		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(id);
@@ -125,7 +131,7 @@ public class CustomerFacade implements CouponClientFacade {
 	public CouponClientFacade login(String name, String password, clientType c) throws Exception {
 		if (customerDBDAO.login(name, password)) {
 			System.out.println("LOGIN of " + name);
-			customer = customerDBDAO.getCustomer(name);
+			this.customer = customerDBDAO.getCustomer(name);
 			return this;
 		} else
 			return null;

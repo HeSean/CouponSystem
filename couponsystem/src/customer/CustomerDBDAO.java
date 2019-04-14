@@ -14,6 +14,7 @@ import java.util.Collection;
 import coupon.Coupon;
 import coupon.CouponDBDAO;
 import coupon.CouponType;
+import exception.WrongInfoInsertedException;
 
 public class CustomerDBDAO implements CustomerDAO {
 
@@ -267,16 +268,25 @@ public class CustomerDBDAO implements CustomerDAO {
 		boolean correctInitials = false;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("SELECT id, cust_name, password FROM customers WHERE cust_name = ?");
-		String password = null;
+		String password = null, name = null;
+		long id;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, custName);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				password = resultSet.getString("password");
+				name = resultSet.getString("cust_name");
+				id = resultSet.getLong("id");
+			}
+			if (name == null) {
+				throw new WrongInfoInsertedException("Company with that name doesnt exist.");
 			}
 			if (givenPassword.equals(password)) {
 				correctInitials = true;
 			}
+		} catch (WrongInfoInsertedException e) {
+			e.printStackTrace();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

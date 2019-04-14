@@ -98,7 +98,7 @@ public class CompanyFacade implements CouponClientFacade {
 	public CouponClientFacade login(String name, String password, clientType c) throws Exception {
 		if (companyDBDAO.login(name, password)) {
 			System.out.println("LOGIN of " + name);
-			company = companyDBDAO.getCompany(name);
+			this.company = companyDBDAO.getCompany(name);
 			return this;
 		} else
 			return null;
