@@ -39,6 +39,9 @@ public class Testing {
 		Customer customer1 = new Customer("Sean", "1234");
 		Customer customer2 = new Customer("Michael", "1234");
 		Customer customer3 = new Customer("Tomer", "1234");
+		Customer customer4 = new Customer("Kobi", "1234");
+		Customer customer5 = new Customer("Maya", "1234");
+		Customer customer6 = new Customer("Aurora", "1234");
 
 		Company company1 = new Company("Yesplanet", "1234", "Yesplanet@gmail.com");
 		Company company2 = new Company("Hagor", "1234", "Hagor@gmail.com");
@@ -54,6 +57,9 @@ public class Testing {
 		// adminFacade.createCustomer(customer1);
 		// adminFacade.createCustomer(customer2);
 		// adminFacade.createCustomer(customer3);
+		// adminFacade.createCustomer(customer4);
+		// adminFacade.createCustomer(customer5);
+		// adminFacade.createCustomer(customer6);
 		// // //
 		// companyFacade.createCoupon(coupon1, company1.getId());
 		// companyFacade.createCoupon(coupon2, company1.getId());
@@ -79,32 +85,45 @@ public class Testing {
 
 		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
 		//
-		// adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
-		// adminFacade.getAllCompanies();
+		adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
+		adminFacade.getAllCompanies();
 		// adminFacade.getAllCustomers();
 		// companyFacade.removeCoupon(coupon1);
 
 		// companyFacade.login("Japanika", "1234", clientType.COMPANY);
-		// companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
-		// System.out.println(companyFacade.getAllCoupon());
 		// facades are able to override logins but not purchase coupon method - stuck
 		// with same id when trying to buy coupon
 
+		companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
+		System.out.println(companyFacade.getAllCoupon());
 
+//		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
+//		customerFacade.purchaseCoupon(customer1, coupon1);
+//		customerFacade.purchaseCoupon(customer1, coupon1);
+//		System.out.println(customerFacade.getCouponsPurchaseHistory());
+//
+//		customerFacade.login("Michael", "1234", clientType.CUSTOMER);
+//		customerFacade.purchaseCoupon(customer2, coupon1);
 		
-		//customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
-		//System.out.println(customerFacade.getCouponsPurchaseHistory());
-
-		// customerFacade.purchaseCoupon(customer3, coupon1);
-
-		//customerFacade.login("Sean", "1234", clientType.CUSTOMER);
-		
-		
-		customerFacade.login("Michael", "1234", clientType.CUSTOMER);
+//		customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
+//		customerFacade.purchaseCoupon(customer3, coupon1);
+//
+		customerFacade.login("Kobi", "1234", clientType.CUSTOMER);
+		//customerFacade.purchaseCoupon(customer4, coupon1);
 		System.out.println(customerFacade.getCouponsPurchaseHistory());
 
-		customerFacade.purchaseCoupon(customer2, coupon1);
-		System.out.println(customerFacade.getCouponsPurchaseHistory());
+		customerFacade.login("Maya", "1234", clientType.CUSTOMER);
+		//customerFacade.purchaseCoupon(customer5, coupon1);
+	System.out.println(customerFacade.getCouponsPurchaseHistory());
+
+		customerFacade.login("Aurora", "1234", clientType.CUSTOMER);
+		//customerFacade.purchaseCoupon(customer6, coupon1);
+System.out.println(customerFacade.getCouponsPurchaseHistory());
+
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
+		//
+		// customerFacade.purchaseCoupon(customer2, coupon1);
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 
 		System.out.println("End.");
 	}

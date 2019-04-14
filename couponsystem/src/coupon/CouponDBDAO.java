@@ -54,16 +54,12 @@ public class CouponDBDAO implements CouponDAO {
 	// delete one item from DB stock on purchase
 	public void deleteFromStockDB(Coupon boughtCoupon) throws Exception {
 		if (boughtCoupon.getAmount() > 0) {
-			int newAmount = boughtCoupon.getAmount() - 1;
 			Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 			String sql = String.format("UPDATE coupons SET amount = amount - 1 WHERE id = ?");
 			try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 				connection.setAutoCommit(false);
-				preparedStatement.setInt(1, newAmount);
-				preparedStatement.setLong(2, boughtCoupon.getId());
+				preparedStatement.setLong(1,  boughtCoupon.getId());
 				preparedStatement.executeUpdate();
-				System.out.println("Update succesful. new coupon amount of coupon  \" " + boughtCoupon.getTitle()
-						+ "\" is " + newAmount);
 				connection.commit();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -71,7 +67,7 @@ public class CouponDBDAO implements CouponDAO {
 				connection.close();
 			}
 		} else
-			throw new OutOfStockException(coupon.getTitle());
+			throw new OutOfStockException(boughtCoupon.getTitle());
 	}
 
 	// delete one item from JB stock on purchase
