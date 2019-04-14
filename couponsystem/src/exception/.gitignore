@@ -3,3 +3,5 @@
 /AlreadyBoughtException.class
 /ExpiredCouponException.class
 /EmptyException.class
+/NotExistsException.class
+/WrongInfoInsertedException.class

@@ -3,15 +3,12 @@ package clients;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.Predicate;
-
 import coupon.Coupon;
 import coupon.CouponDBDAO;
 import coupon.CouponType;
 import customer.Customer;
 import customer.CustomerDBDAO;
-import exception.AlreadyBoughtException;
-import exception.EmptyException;
+import exception.WrongInfoInsertedException;
 import exception.ExpiredCouponException;
 import exception.OutOfStockException;
 import main.clientType;
@@ -73,7 +70,9 @@ public class CustomerFacade implements CouponClientFacade {
 	
 	// get customers purchase history By Type
 	public Collection<Coupon> getAllPurchasedCouponsByType(CouponType couponType) throws Exception {
-		System.out.println("Customer " + customer.getCustName() + " previously purchased coupons by type of " + couponType + " are -");
+		System.out.println( "Previously purchased coupons of type " + couponType + " by customer " + customer.getCustName() + " are -");
+		
+		// through db
 		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(customer.getId());
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		if (!couponsID.isEmpty()) {
@@ -86,8 +85,23 @@ public class CustomerFacade implements CouponClientFacade {
 				iterator.remove();
 			}
 		}
-		return coupons;
-	}
+		//return coupons;
+		
+		// through java beans
+		ArrayList<Coupon> couponsz = new ArrayList<Coupon>();
+		couponsz = customer.getCoupons();
+		if (!couponsz.isEmpty()) {
+		Iterator<Coupon> iteratorz = couponsz.iterator();
+		while (iteratorz.hasNext()) {
+			Coupon coupon = (Coupon) iteratorz.next();
+			if (!couponType.equals(coupon.getType())) {
+				iteratorz.remove();
+			}
+		}
+		return couponsz;
+		} else throw new WrongInfoInsertedException("No coupons found for this customer - " + customer.getCustName());
+	} 
+	
 	
 	// get customers purchase history By Price
 	public Collection<Coupon> getAllPurchasedCouponsByPrice(double price) throws Exception {

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import exception.EmptyException;
+import exception.WrongInfoInsertedException;
 import exception.NameExistsException;
 
 public class Database {
@@ -105,8 +105,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Coupon table succesfully dropped.");
 			} else
-				throw new EmptyException("Coupon Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Coupon Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -118,8 +118,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customers table succesfully dropped.");
 			} else
-				throw new EmptyException("Customer Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Customer Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -132,8 +132,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Companys table succesfully dropped.");
 			} else
-				throw new EmptyException("Companys Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Companys Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -146,8 +146,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Company_Coupon table succesfully dropped.");
 			} else
-				throw new EmptyException("Company_Coupon Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Company_Coupon Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -160,8 +160,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() == 0) {
 				System.out.println("Customer_Coupon table succesfully dropped.");
 			} else
-				throw new EmptyException("Customer_Coupon Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Customer_Coupon Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -174,8 +174,8 @@ public class Database {
 			if (preparedStatement.executeUpdate() != 0) {
 				System.out.println("Alter action succesfully --> " + "ALTER table if exists" + tableName + "CHANGE " + oldColumn + " " + newColumn + " " + type);
 			} else
-				throw new EmptyException("Customer_Coupon Table");
-		} catch (EmptyException e) {
+				throw new WrongInfoInsertedException("Customer_Coupon Table");
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		}
 	}

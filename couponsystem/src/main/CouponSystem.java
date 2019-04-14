@@ -6,7 +6,7 @@ import clients.CouponClientFacade;
 import clients.CustomerFacade;
 import coupon.Coupon;
 import coupon.CouponDBDAO;
-import exception.EmptyException;
+import exception.WrongInfoInsertedException;
 
 // singleton
 public class CouponSystem {
@@ -23,8 +23,8 @@ public class CouponSystem {
 		try {
 			if (!couponDBDAO.getAllCoupons().isEmpty()) {
 				startCouponsUpdater();
-			} else throw new EmptyException();
-		} catch (EmptyException e) {
+			} else throw new WrongInfoInsertedException();
+		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();

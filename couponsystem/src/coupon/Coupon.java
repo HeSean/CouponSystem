@@ -8,7 +8,7 @@ public class Coupon {
 	private String title;
 	private LocalDate startDate;
 	private LocalDate endDate;
-	private int amount;
+	private static int amount;
 	private CouponType type;
 	private String message;
 	private double price;
@@ -59,6 +59,7 @@ public class Coupon {
 		setType(type);
 		setMessage(message);
 		setPrice(price);
+		//setImage(image2);
 	}
 
 	private void setType(CouponType type) {
@@ -101,8 +102,8 @@ public class Coupon {
 		return amount;
 	}
 
-	public void setAmount(int amount) {
-		this.amount = amount;
+	public void setAmount(int newAmount) {
+		amount = newAmount;
 	}
 
 	public CouponType getType() {

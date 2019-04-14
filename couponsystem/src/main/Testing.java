@@ -64,22 +64,26 @@ public class Testing {
 		// companyFacade.getCoupon(2);
 		// companyFacade.getAllCoupon();
 		// companyFacade.getCouponByDate(LocalDate.now());
+		//customerFacade.purchaseCoupon(customer1, coupon1);
 		//
 		// companyFacade.removeCoupon(coupon1);
-		// customerFacade.purchaseCoupon(customer1, coupon1);
+		 
 		// customerFacade.getAllCustomers();
 		// System.out.println(customerFacade.getCustomer(1));
 		// System.out.println(customerFacade.getPurchaseHistory(1));
 
-		 customerFacade.login("Sean", "1234", clientType.CUSTOMER);
-		 System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
+		//customerFacade.login("Sean", "1234", clientType.CUSTOMER);
+		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
+		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
+		 //System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
+		// System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.ELECTRICITY));
+
+		//adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
+		//adminFacade.getAllCompanies();
+
+		companyFacade.login("Japanika", "1234", clientType.COMPANY);
+		//companyFacade.getAllCoupon();
 		
-		 System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
-
-		 System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
-	
-		 System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.ELECTRICITY));
-
 		System.out.println("End.");
 	}
 

@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import coupon.Coupon;
 import coupon.CouponDBDAO;
+import customer.Customer;
+import exception.NotExistsException;
+import exception.WrongInfoInsertedException;
 
 public class CompanyDBDAO implements CompanyDAO {
 
@@ -114,23 +117,15 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Company getCompany(long id) throws Exception {
-		// Company company = new Company();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("SELECT comp_Name, password, email FROM companys WHERE id=?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-
 				String compName = resultSet.getString("comp_Name");
 				String password = resultSet.getString("password");
 				String email = resultSet.getString("email");
-				// System.out.printf("id- %d | name- %s | password - %s | email - %s\n", id,
-				// compName, password, email);
-				// company.setId(id);
-				// company.setCompName(compName);
-				// company.setPassword(password);
-				// company.setEmail(email);
 				return new Company(id, compName, password, email);
 			}
 		} catch (SQLException e) {
@@ -164,41 +159,48 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-			return null;
+		return null;
 	}
 
 	public Company getCompany(String name) throws Exception {
-		Company company = new Company();
+		Company wantedCompany = new Company();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format("SELECT id, comp_name, password, email FROM companys WHERE comp_name=?");
+		String sql = String.format("SELECT * FROM companys WHERE comp_name = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, name);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-				company.setId(resultSet.getLong("id"));
-				company.setCompName(resultSet.getString("comp_Name"));
-				company.setPassword(resultSet.getString("password"));
-				company.setEmail(resultSet.getString("email"));
-				company.setCoupons((ArrayList<Coupon>) getCompanyCoupons(company));
+				long id = resultSet.getLong("id");
+				String compName = resultSet.getString("comp_name");
+				String password = resultSet.getString("password");
+				String email = resultSet.getString("email");
+				wantedCompany.setId(id);
+				wantedCompany.setCompName(compName);
+				wantedCompany.setPassword(password);
+				wantedCompany.setEmail(email);
+				wantedCompany.setCoupons(getCoupons(getCouponsID(id)));
+				//System.out.println(wantedCompany);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			connection.close();
 		}
-		return company;
+		return wantedCompany;
 	}
 
-	public Collection<Coupon> getCompanyCoupons(Company comapny) throws Exception {
-		Collection<Long> couponsID = getCouponsID(comapny);
+	public ArrayList<Coupon> getCompanyCoupons() throws Exception {
+		ArrayList<Long> couponsID = getCouponsID(company.getId());
 		return getCoupons(couponsID);
 	}
 
 	// get all coupon ids created by company
-	public Collection<Long> getCouponsID(Company company) throws Exception {
-		Collection<Long> couponsID = new ArrayList<Long>();
+	public ArrayList<Long> getCouponsID(long id) throws Exception {
+		ArrayList<Long> couponsID = new ArrayList<Long>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = "SELECT coupon_ID from company_coupon WHERE comp_ID = ?";
+		String sql = "SELECT coupon_ID from companys_coupon WHERE company_ID = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			preparedStatement.setLong(1, company.getId());
+			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				couponsID.add(resultSet.getLong("coupon_ID"));
@@ -209,8 +211,8 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	// get all coupons the company created
-	public Collection<Coupon> getCoupons(Collection<Long> ids) throws Exception {
-		Collection<Coupon> coupons = new ArrayList<Coupon>();
+	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		ResultSet resultSet;
 		String sql = "select * from coupons WHERE id = ?";
@@ -241,18 +243,26 @@ public class CompanyDBDAO implements CompanyDAO {
 	public boolean login(String compName, String givenPassword) throws Exception {
 		boolean correctInitials = false;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format("SELECT password FROM companys WHERE comp_name = ?");
-		String password = null;
+		String sql = String.format("SELECT id, comp_name, password, email FROM companys WHERE comp_name = ?");
+		String password = null, name = null;
+		long id;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, compName);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			password = resultSet.getString("password");
-			// while (resultSet.next()) {
-			// password = resultSet.getString("password");
-			// }
-			if (givenPassword == password) {
+			while (resultSet.next()) {
+				password = resultSet.getString("password");
+				name = resultSet.getString("comp_name");
+				id = resultSet.getLong("id");
+			}
+			if (name == null) {
+				throw new WrongInfoInsertedException("Company with that name doesnt exist.");
+			}
+			if (givenPassword.equals(password)) {
 				correctInitials = true;
 			}
+		} catch (WrongInfoInsertedException e) {
+			e.printStackTrace();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

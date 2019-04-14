@@ -17,6 +17,8 @@ import coupon.CouponType;
 
 public class CustomerDBDAO implements CustomerDAO {
 
+	private Customer customer;
+	
 	public CustomerDBDAO() {
 		// TODO Auto-generated constructor stub
 
@@ -149,7 +151,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				wantedCustomer.setId(id);
 				wantedCustomer.setCustName(custName);
 				wantedCustomer.setPassword(password);
-				wantedCustomer.setCoupons((ArrayList<Coupon>) getCoupons((ArrayList<Long>) getCouponsID(id)));
+				wantedCustomer.setCoupons(getCoupons(getCouponsID(id)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -180,7 +182,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	// get all coupon ids bought by customer
-	public Collection<Long> getCouponsID(long wantedID) throws Exception {
+	public ArrayList<Long> getCouponsID(long wantedID) throws Exception {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = "SELECT coupon_ID from customers_coupon WHERE customer_ID = ?";
@@ -195,7 +197,35 @@ public class CustomerDBDAO implements CustomerDAO {
 		}
 	}
 	
+	// get all coupons the customer purchased
+	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
+		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		ResultSet resultSet;
+		String sql = "select * from coupons WHERE id = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			for (Long iLong : ids) {
+				preparedStatement.setLong(1, iLong);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					long id = resultSet.getLong("id");
+					String title = resultSet.getString("title");
+					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
+					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
+					int amount = resultSet.getInt("amount");
+					String type = resultSet.getString(6);
+					String message = resultSet.getString("message");
+					Double price = resultSet.getDouble("price");
+					String image = resultSet.getString("image");
+				
 
+					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				}
+			}
+			connection.close();
+			return coupons;
+		}
+	}
 	@Override
 	public Collection<Coupon> getAllCoupons(long wantedID) throws Exception {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
@@ -230,35 +260,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		}
 	}
 
-	// get all coupons the customer purchased
-	public Collection<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		ResultSet resultSet;
-		String sql = "select * from coupons WHERE id = ?";
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			for (Long iLong : ids) {
-				preparedStatement.setLong(1, iLong);
-				resultSet = preparedStatement.executeQuery();
-				while (resultSet.next()) {
-					long id = resultSet.getLong("id");
-					String title = resultSet.getString("title");
-					LocalDate startDate = resultSet.getDate("start_Date").toLocalDate();
-					LocalDate endDate = resultSet.getDate("end_Date").toLocalDate();
-					int amount = resultSet.getInt("amount");
-					String type = resultSet.getString(6);
-					String message = resultSet.getString("message");
-					Double price = resultSet.getDouble("price");
-					String image = resultSet.getString("image");
-				
 
-					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
-				}
-			}
-			connection.close();
-			return coupons;
-		}
-	}
 
 	@Override
 	public boolean login(String custName, String givenPassword) throws SQLException {

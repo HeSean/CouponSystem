@@ -1,6 +1,7 @@
 package clients;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import company.Company;
@@ -13,8 +14,9 @@ import main.clientType;
 
 public class CompanyFacade implements CouponClientFacade {
 
-	CouponDBDAO couponDBDAO = new CouponDBDAO();
-	CompanyDBDAO companyDBDAO = new CompanyDBDAO();
+	private Company company;
+	private CouponDBDAO couponDBDAO = new CouponDBDAO();
+	private CompanyDBDAO companyDBDAO = new CompanyDBDAO();
 
 	public CompanyFacade() {
 		// TODO Auto-generated constructor stub
@@ -49,9 +51,11 @@ public class CompanyFacade implements CouponClientFacade {
 		return couponDBDAO.getCoupon(id);
 	}
 
-	 public Collection<Coupon> getAllCoupon() throws Exception {
-		 return couponDBDAO.getAllCoupons();
-	 }
+	public ArrayList<Coupon> getAllCoupon() throws Exception {
+		System.out.println(company);
+		ArrayList<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
+		return companyDBDAO.getCoupons(couponsID);
+	}
 
 	public Collection<Coupon> getCouponByType(CouponType cType) throws Exception {
 		System.out.println("Coupons from type " + cType + " are:");
@@ -72,9 +76,9 @@ public class CompanyFacade implements CouponClientFacade {
 			System.out.println("No coupons were found under that price - " + price);
 		return null;
 	}
-	
+
 	public Collection<Coupon> getCouponByDate(LocalDate localDate) throws Exception {
-		System.out.println("Available coupons by given date - "+ localDate + " are:");
+		System.out.println("Available coupons by given date - " + localDate + " are:");
 		Collection<Coupon> coupons = couponDBDAO.getCouponByDate(localDate);
 		if (!coupons.isEmpty()) {
 			return coupons;
@@ -92,8 +96,10 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 
 	@Override
-	public CompanyFacade login(String name, String password, clientType c) throws Exception {
+	public CouponClientFacade login(String name, String password, clientType c) throws Exception {
 		if (companyDBDAO.login(name, password)) {
+			System.out.println("LOGIN of " + name);
+			company = companyDBDAO.getCompany(name);
 			return this;
 		} else
 			return null;
