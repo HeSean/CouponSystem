@@ -85,10 +85,11 @@ public class Testing {
 
 		// companyFacade.removeCoupon(coupon1);
 		// companyFacade.createCoupon(coupon1, company1.getId());
-
+		System.out.println();
 		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
-		 customerFacade.purchaseCoupon(customer1, coupon1);
-
+		customerFacade.purchaseCoupon(customer1, coupon4);
+		System.out.println();
+		companyFacade.login("Japanika", "1234", clientType.COMPANY);
 		System.out.println(companyFacade.getAllCoupon());
 
 		System.out.println("End.");

@@ -113,9 +113,7 @@ public class CouponDBDAO implements CouponDAO {
 						coupon.setAmount(newAmount);
 					}
 				}
-				System.out.println("second syso: " + list);
 				wantedCompany.setCoupons(list);
-				System.out.println(wantedCompany.getCoupons());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
