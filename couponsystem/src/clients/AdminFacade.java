@@ -1,9 +1,12 @@
 package clients;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import company.Company;
 import company.CompanyDBDAO;
+import coupon.Coupon;
 import coupon.CouponDBDAO;
 import customer.Customer;
 import customer.CustomerDBDAO;
@@ -94,12 +97,16 @@ public class AdminFacade implements CouponClientFacade {
 		// customerDBDAO.updateCustomer(afterUpdate);
 	}
 
-	public void getCustomer(long id) throws Exception {
-		customerDBDAO.getCustomer(id);
+	public Customer getCustomer(long id) throws Exception {
+		return customerDBDAO.getCustomer(id);
 	}
 
-	public void getAllCustomers() throws Exception {
-		customerDBDAO.getAllCustomers();
+	public Collection<Customer> getAllCustomers() throws Exception {
+		return customerDBDAO.getAllCustomers();
+	}
+	
+	public Collection<Coupon> getAllCoupons() throws Exception{
+		return null;
 	}
 
 }

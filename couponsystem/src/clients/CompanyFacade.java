@@ -52,7 +52,6 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 
 	public ArrayList<Coupon> getAllCoupon() throws Exception {
-		System.out.println(company);
 		ArrayList<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
 		return companyDBDAO.getCoupons(couponsID);
 	}

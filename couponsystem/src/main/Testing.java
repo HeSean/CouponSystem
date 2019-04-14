@@ -53,7 +53,6 @@ public class Testing {
 		// adminFacade.createCustomer(customer2);
 		// adminFacade.createCustomer(customer3);
 		// //
-		// companyFacade.createCoupon(coupon1, company1.getId());
 		// companyFacade.createCoupon(coupon2, company1.getId());
 		// companyFacade.createCoupon(coupon3, company2.getId());
 		// companyFacade.createCoupon(coupon4, company3.getId());
@@ -64,26 +63,34 @@ public class Testing {
 		// companyFacade.getCoupon(2);
 		// companyFacade.getAllCoupon();
 		// companyFacade.getCouponByDate(LocalDate.now());
-		//customerFacade.purchaseCoupon(customer1, coupon1);
-		//
+
 		// companyFacade.removeCoupon(coupon1);
-		 
+
 		// customerFacade.getAllCustomers();
 		// System.out.println(customerFacade.getCustomer(1));
 		// System.out.println(customerFacade.getPurchaseHistory(1));
 
-		//customerFacade.login("Sean", "1234", clientType.CUSTOMER);
 		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
-		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
-		 //System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
+		// System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
 		// System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.ELECTRICITY));
 
-		//adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
-		//adminFacade.getAllCompanies();
+		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
+		//
+		// adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
+		// adminFacade.getAllCompanies();
+		// adminFacade.getAllCustomers();
 
-		companyFacade.login("Japanika", "1234", clientType.COMPANY);
-		//companyFacade.getAllCoupon();
-		
+		companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
+		System.out.println(companyFacade.getAllCoupon());
+
+		// companyFacade.removeCoupon(coupon1);
+		// companyFacade.createCoupon(coupon1, company1.getId());
+
+		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
+		 customerFacade.purchaseCoupon(customer1, coupon1);
+
+		System.out.println(companyFacade.getAllCoupon());
+
 		System.out.println("End.");
 	}
 

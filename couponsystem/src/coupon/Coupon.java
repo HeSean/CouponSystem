@@ -8,7 +8,7 @@ public class Coupon {
 	private String title;
 	private LocalDate startDate;
 	private LocalDate endDate;
-	private static int amount;
+	private int amount;
 	private CouponType type;
 	private String message;
 	private double price;

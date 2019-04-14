@@ -12,13 +12,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import company.Company;
+import company.CompanyDBDAO;
 import customer.Customer;
 import exception.OutOfStockException;
 
 public class CouponDBDAO implements CouponDAO {
 
 	private Coupon coupon;
-	
+	private CompanyDBDAO companyDBDAO;
+
 	public CouponDBDAO() {
 	}
 
@@ -47,27 +50,78 @@ public class CouponDBDAO implements CouponDAO {
 			e.printStackTrace();
 		}
 	}
-	
-	// delete one item from stock on purchase
-	public void deleteFromStock() throws Exception {
-		if (coupon.getAmount() > 0) {
-		int newAmount = this.coupon.getAmount();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		String sql = String.format(
-				"UPDATE coupons set amount = ? WHERE id = ?");
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			connection.setAutoCommit(false);
-			preparedStatement.setLong(1, coupon.getId());
-			preparedStatement.setInt(4, newAmount--);
-			preparedStatement.executeUpdate();
-			System.out.println("\nUpdate succesful.\nNew Data - " + coupon);
-			connection.commit();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			connection.close();
+
+	// delete one item from DB stock on purchase
+	public void deleteFromStockDB(Coupon boughtCoupon) throws Exception {
+		if (boughtCoupon.getAmount() > 0) {
+			int newAmount = boughtCoupon.getAmount() - 1;
+			Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+			String sql = String.format("UPDATE coupons set amount = ? WHERE id = ?");
+			try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+				connection.setAutoCommit(false);
+				preparedStatement.setInt(1, newAmount);
+				preparedStatement.setLong(2, boughtCoupon.getId());
+				preparedStatement.executeUpdate();
+				System.out.println("Update succesful. new coupon amount of coupon  \" " + boughtCoupon.getTitle()
+						+ "\" is " + newAmount);
+				connection.commit();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				connection.close();
+			}
+		} else
+			throw new OutOfStockException(coupon.getTitle());
+	}
+
+	// delete one item from JB stock on purchase
+	public void deleteFromStockJB(Coupon boughtCoupon) throws Exception {
+		if (boughtCoupon.getAmount() > 0) {
+
+			int newAmount = boughtCoupon.getAmount() - 1, wantedCouponIndex = 0;
+			long companyID = 0;
+			String companyName = null;
+			String sqlCompanyID = String.format("SELECT * FROM companys_coupon WHERE coupon_id = ?");
+			String sqlCompanyName = String.format("SELECT * FROM companys WHERE id = ?");
+			Company wantedCompany = new Company();
+			companyDBDAO = new CompanyDBDAO();
+			ResultSet resultSet;
+			PreparedStatement preparedStatement;
+
+			Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+			try {
+				// getting company ID
+				preparedStatement = connection.prepareStatement(sqlCompanyID);
+				preparedStatement.setLong(1, boughtCoupon.getId());
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					companyID = resultSet.getLong("company_id");
+				}
+
+				// getting company Name
+				preparedStatement = connection.prepareStatement(sqlCompanyName);
+				preparedStatement.setLong(1, companyID);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					companyName = resultSet.getString("comp_name");
+				}
+				// updating current coupons list to remove one item from coupon amount
+				wantedCompany = companyDBDAO.getCompany(companyName);
+				ArrayList<Coupon> list = (ArrayList<Coupon>) wantedCompany.getCoupons();
+				for (Coupon coupon : list) {
+					if (coupon.equals(boughtCoupon)) {
+						coupon.setAmount(newAmount);
+					}
+				}
+				System.out.println("second syso: " + list);
+				wantedCompany.setCoupons(list);
+				System.out.println(wantedCompany.getCoupons());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				connection.close();
+			}
 		}
-		} else throw new OutOfStockException (coupon.getTitle());
 	}
 
 	// insert new created coupon to company-coupon table
@@ -138,17 +192,17 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.executeUpdate();
 			System.out.println("Delete succesful from Coupons Table");
 
-			preparedStatement = connection.prepareStatement(couponsCustomerSQL);
-			connection.setAutoCommit(false);
-			preparedStatement.setLong(1, coupon.getId());
-			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from Customer - Coupon Table");
-
-			preparedStatement = connection.prepareStatement(couponsCompanySQL);
-			connection.setAutoCommit(false);
-			preparedStatement.setLong(1, coupon.getId());
-			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from Company - Coupon Table");
+			// preparedStatement = connection.prepareStatement(couponsCustomerSQL);
+			// connection.setAutoCommit(false);
+			// preparedStatement.setLong(1, coupon.getId());
+			// preparedStatement.executeUpdate();
+			// System.out.println("Delete succesful from Customer - Coupon Table");
+			//
+			// preparedStatement = connection.prepareStatement(couponsCompanySQL);
+			// connection.setAutoCommit(false);
+			// preparedStatement.setLong(1, coupon.getId());
+			// preparedStatement.executeUpdate();
+			// System.out.println("Delete succesful from Company - Coupon Table");
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -381,8 +435,7 @@ public class CouponDBDAO implements CouponDAO {
 
 	// purchasing coupon
 	public void purchaseCoupon(Customer customer, Coupon coupon) throws Exception {
-		this.coupon = coupon;
-		deleteFromStock();
+		// this.coupon = coupon;
 		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
 		String sql = String.format("INSERT INTO customers_coupon (customer_ID, coupon_ID) VALUES (?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
@@ -395,6 +448,8 @@ public class CouponDBDAO implements CouponDAO {
 			System.out.println("Purchased coupon succesfully. Customer " + customer.getCustName() + " bought coupon - "
 					+ coupon.getTitle());
 			customer.addCoupon(coupon);
+			deleteFromStockDB(coupon);
+			deleteFromStockJB(coupon);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			System.out.println("Exception - Customer cannot buy more than one of the same coupon.");
 		} catch (SQLException e) {
@@ -403,7 +458,5 @@ public class CouponDBDAO implements CouponDAO {
 			connection.close();
 		}
 	}
-
-	
 
 }
