@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import clients.AdminFacade;
 import clients.CompanyFacade;
 import clients.CustomerFacade;
+import clients.clientType;
 import company.Company;
 import coupon.Coupon;
 import coupon.CouponType;
@@ -61,10 +62,10 @@ public class Testing {
 		// adminFacade.createCustomer(customer5);
 		// adminFacade.createCustomer(customer6);
 		// // //
-		// companyFacade.createCoupon(coupon1, company1.getId());
-		// companyFacade.createCoupon(coupon2, company1.getId());
-		// companyFacade.createCoupon(coupon3, company2.getId());
-		// companyFacade.createCoupon(coupon4, company3.getId());
+//		 companyFacade.createCoupon(coupon1, company1.getId());
+//		 companyFacade.createCoupon(coupon2, company1.getId());
+//		 companyFacade.createCoupon(coupon3, company2.getId());
+//		 companyFacade.createCoupon(coupon4, company3.getId());
 		// companyFacade.getAllCompanies();
 		// companyFacade.getAllCoupon();
 		// companyFacade.getCouponByPrice(10);
@@ -85,8 +86,8 @@ public class Testing {
 
 		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
 		//
-		adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
-		adminFacade.getAllCompanies();
+		// adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
+		// adminFacade.getAllCompanies();
 		// adminFacade.getAllCustomers();
 		// companyFacade.removeCoupon(coupon1);
 
@@ -94,8 +95,8 @@ public class Testing {
 		// facades are able to override logins but not purchase coupon method - stuck
 		// with same id when trying to buy coupon
 
-		companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
-		System.out.println(companyFacade.getAllCoupon());
+//		companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
+//		System.out.println(companyFacade.getAllCoupon());
 
 //		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
 //		customerFacade.purchaseCoupon(customer1, coupon1);
@@ -108,22 +109,24 @@ public class Testing {
 //		customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
 //		customerFacade.purchaseCoupon(customer3, coupon1);
 //
-		customerFacade.login("Kobi", "1234", clientType.CUSTOMER);
-		//customerFacade.purchaseCoupon(customer4, coupon1);
-		System.out.println(customerFacade.getCouponsPurchaseHistory());
-
-		customerFacade.login("Maya", "1234", clientType.CUSTOMER);
-		//customerFacade.purchaseCoupon(customer5, coupon1);
-	System.out.println(customerFacade.getCouponsPurchaseHistory());
-
-		customerFacade.login("Aurora", "1234", clientType.CUSTOMER);
-		//customerFacade.purchaseCoupon(customer6, coupon1);
-System.out.println(customerFacade.getCouponsPurchaseHistory());
+		// customerFacade.login("Kobi", "1234", clientType.CUSTOMER);
+		// //customerFacade.purchaseCoupon(customer4, coupon1);
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
+		//
+		// customerFacade.login("Maya", "1234", clientType.CUSTOMER);
+		// //customerFacade.purchaseCoupon(customer5, coupon1);
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
+		//
+		// customerFacade.login("Aurora", "1234", clientType.CUSTOMER);
+		// //customerFacade.purchaseCoupon(customer6, coupon1);
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 
 		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 		//
 		// customerFacade.purchaseCoupon(customer2, coupon1);
 		// System.out.println(customerFacade.getCouponsPurchaseHistory());
+		
+		//CouponSystem.getInstance().startCouponsUpdater();
 
 		System.out.println("End.");
 	}

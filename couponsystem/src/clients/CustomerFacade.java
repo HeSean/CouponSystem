@@ -11,7 +11,6 @@ import customer.CustomerDBDAO;
 import exception.WrongInfoInsertedException;
 import exception.ExpiredCouponException;
 import exception.OutOfStockException;
-import main.clientType;
 
 public class CustomerFacade implements CouponClientFacade {
 

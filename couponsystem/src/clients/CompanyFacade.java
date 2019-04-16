@@ -10,7 +10,6 @@ import coupon.Coupon;
 import coupon.CouponDBDAO;
 import coupon.CouponType;
 import exception.NameExistsException;
-import main.clientType;
 
 public class CompanyFacade implements CouponClientFacade {
 

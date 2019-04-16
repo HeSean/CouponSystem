@@ -10,8 +10,7 @@ import coupon.Coupon;
 import coupon.CouponDBDAO;
 import customer.Customer;
 import customer.CustomerDBDAO;
-import exception.NameExistsException;
-import main.clientType;;
+import exception.NameExistsException;;
 
 public class AdminFacade implements CouponClientFacade {
 

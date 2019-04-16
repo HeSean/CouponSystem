@@ -22,7 +22,7 @@ public class EmptyException extends Exception {
 	@Override
 	public String toString() {
 		if (name != null) {
-			return "EmptyException - No " + name + " was found.";
+			return "EmptyException -  " + name ;
 		} else 
 		return "EmptyException - No objects were found in list";
 	}
