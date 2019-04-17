@@ -1,10 +1,10 @@
 package main;
 
-import clients.AdminFacade;
-import clients.CompanyFacade;
-import clients.CouponClientFacade;
-import clients.CustomerFacade;
-import clients.clientType;
+import facade.AdminFacade;
+import facade.CompanyFacade;
+import facade.CouponClientFacade;
+import facade.CustomerFacade;
+import facade.clientType;
 
 // singleton
 public class CouponSystem {

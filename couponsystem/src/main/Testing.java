@@ -2,14 +2,14 @@ package main;
 
 import java.time.LocalDate;
 
-import clients.AdminFacade;
-import clients.CompanyFacade;
-import clients.CustomerFacade;
-import clients.clientType;
 import company.Company;
 import coupon.Coupon;
 import coupon.CouponType;
 import customer.Customer;
+import facade.AdminFacade;
+import facade.CompanyFacade;
+import facade.CustomerFacade;
+import facade.clientType;
 
 public class Testing {
 
@@ -32,7 +32,7 @@ public class Testing {
 				CouponType.FOOD, "By YesPlanet", 15);
 		Coupon coupon2 = new Coupon("Free Popcorn with movie", LocalDate.now(), LocalDate.of(2019, 10, 1), 5,
 				CouponType.FOOD, "By YesPlanet", 15);
-		Coupon coupon3 = new Coupon("Free Tent with BBQ", LocalDate.now(), LocalDate.of(2019, 10, 1), 5,
+		Coupon coupon3 = new Coupon("Free Tent with Lederman swiss knife", LocalDate.now(), LocalDate.of(2019, 10, 1), 5,
 				CouponType.CAMPING, "By Hagor", 15);
 		Coupon coupon4 = new Coupon("Bonus ChickenWing with takeout order", LocalDate.now(), LocalDate.of(2019, 10, 1),
 				5, CouponType.FOOD, "By Japanika", 15);

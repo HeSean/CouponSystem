@@ -1,25 +1,20 @@
 package main;
 
-	import java.sql.Connection;
-	import java.sql.SQLException;
-	import java.util.List;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
-	public interface ConnectionPool {
+public interface ConnectionPool {
 
-	    Connection getConnection() throws SQLException;
-	    
-	    boolean releaseConnection(Connection connection);
-	    
-	    List<Connection> getConnectionPool();
-	    
-	    int getSize();
-	    
-	    String getUrl();
-	    
-	    String getUser();
+	Connection getConnection() throws SQLException;
 
-	    String getPassword();
-	    
-	    void closeAllConnections() throws SQLException;;
-	}   
+	boolean releaseConnection(Connection connection);
 
+	List<Connection> getConnectionPool();
+
+	int getSize();
+
+	void closeAllConnections() throws SQLException;
+
+	String getUrl();;
+}

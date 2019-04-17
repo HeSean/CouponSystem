@@ -1,11 +1,12 @@
 package main;
 
 import java.time.LocalDate;
-import clients.AdminFacade;
+
 import company.Company;
 import coupon.Coupon;
 import coupon.CouponType;
 import customer.Customer;
+import facade.AdminFacade;
 
 public class Test {
 
@@ -77,7 +78,7 @@ public class Test {
 		// adminFacade.updateCustomer(1, "12347785");
 
 
-		clients.CompanyFacade companyFacade = new clients.CompanyFacade();
+		facade.CompanyFacade companyFacade = new facade.CompanyFacade();
 		//Company company4 = new Company(4L,"Laser Center", "1234", "lasercenter@gmail.com");
 		//company4.addCoupon(coupon2);
 		
@@ -95,7 +96,7 @@ public class Test {
 		// companyFacade.getAllCoupons();
 		// companyFacade.getCouponByPrice(10);
 
-		clients.CustomerFacade customerFacade = new clients.CustomerFacade();
+		facade.CustomerFacade customerFacade = new facade.CustomerFacade();
 		Customer c2 = new Customer("Sean Hed", "1234");
 		// customerFacade.purchaseCoupon(c2, coupon);
 		// System.out.println(customerFacade.getPurchaseHistory(2));
