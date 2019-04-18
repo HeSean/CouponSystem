@@ -1,9 +1,6 @@
-package customer;
+package javabeans;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
-import coupon.Coupon;
 
 public class Customer {
 	private static int COUNTER = 1;

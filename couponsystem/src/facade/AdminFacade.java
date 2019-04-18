@@ -1,16 +1,13 @@
 package facade;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 
-import company.Company;
-import company.CompanyDBDAO;
-import coupon.Coupon;
-import coupon.CouponDBDAO;
-import customer.Customer;
-import customer.CustomerDBDAO;
-import exception.NameExistsException;;
+import db.CompanyDBDAO;
+import db.CustomerDBDAO;
+import exception.NameExistsException;
+import javabeans.Company;
+import javabeans.Coupon;
+import javabeans.Customer;;
 
 public class AdminFacade implements CouponClientFacade {
 
@@ -18,7 +15,6 @@ public class AdminFacade implements CouponClientFacade {
 	private static final String ADMINPASSWORD = "1234";
 	private CompanyDBDAO companyDBDAO;
 	private CustomerDBDAO customerDBDAO;
-	private CouponDBDAO couponDBDAO;
 
 	public AdminFacade() throws Exception {
 		companyDBDAO = new CompanyDBDAO();
@@ -36,7 +32,6 @@ public class AdminFacade implements CouponClientFacade {
 
 	// Company Methods
 	public void createCompany(Company company) throws NameExistsException {
-		// missing check for password and name to be req
 		try {
 			if (!companyDBDAO.checkCompanyName(company)) {
 				companyDBDAO.createCompany(company);
@@ -49,17 +44,12 @@ public class AdminFacade implements CouponClientFacade {
 
 	public void removeCompany(Company company) throws Exception {
 		companyDBDAO.removeCompany(company);
-		// missing removal of company's coupons and coupons purchased by customers
 	}
 
 	public void updateCompany (Company company) throws Exception{
 		companyDBDAO.updateCompany(company);
 	}
-//	public void updateCompany(long id, String password, String email) throws Exception {
-//		Company beforeUpdate = companyDBDAO.getCompany(id);
-//		Company afterUpdate = new Company(id, beforeUpdate.getCompName(), password, email);
-//		companyDBDAO.updateCompany(afterUpdate);
-//	}
+
 
 	public Company getCompany(long id) throws Exception {
 		return companyDBDAO.getCompany(id);
@@ -83,17 +73,10 @@ public class AdminFacade implements CouponClientFacade {
 
 	public void removeCustomer(Customer customer) throws Exception {
 		customerDBDAO.removeCustomer(customer);
-		// missing removal of coupon purchase history
 	}
 
 	public void updateCustomer(Customer customer) throws Exception {
 		customerDBDAO.updateCustomer(customer);
-
-		// updateCustomer(long id, String password)
-		// Customer beforeUpdate = customerDBDAO.getCustomer(id);
-		// Customer afterUpdate = new Customer(id, beforeUpdate.getCustName(),
-		// password);
-		// customerDBDAO.updateCustomer(afterUpdate);
 	}
 
 	public Customer getCustomer(long id) throws Exception {

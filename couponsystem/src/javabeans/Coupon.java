@@ -1,4 +1,4 @@
-package coupon;
+package javabeans;
 
 import java.time.LocalDate;
 

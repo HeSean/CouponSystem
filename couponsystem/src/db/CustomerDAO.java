@@ -1,8 +1,9 @@
-package customer;
+package db;
 
 import java.util.Collection;
 
-import coupon.Coupon;
+import javabeans.Coupon;
+import javabeans.Customer;
 
 public interface CustomerDAO {
 

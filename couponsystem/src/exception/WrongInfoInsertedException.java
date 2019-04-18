@@ -5,9 +5,11 @@ public class WrongInfoInsertedException extends Exception {
 	private String msg;
 
 	public WrongInfoInsertedException() {
+		super();
 	}
 
 	public WrongInfoInsertedException(String msg) {
+		super();
 		setMsg(msg);
 	}
 	

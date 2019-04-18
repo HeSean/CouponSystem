@@ -1,34 +1,37 @@
-package company;
+package db;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.SQLSyntaxErrorException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import coupon.Coupon;
-import coupon.CouponDBDAO;
-import customer.Customer;
-import exception.NotExistsException;
+
+import exception.EmptyException;
 import exception.WrongInfoInsertedException;
+import javabeans.Company;
+import javabeans.Coupon;
 
 public class CompanyDBDAO implements CompanyDAO {
 
-	private Company company;
-	private long companyID = 0;
+	private long companyID;
 	CouponDBDAO couponDBDAO = new CouponDBDAO();
 
 	public CompanyDBDAO() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public void createCompany(Company company) throws Exception {
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+	public void createCompany(Company company) {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = String.format("INSERT INTO companys (id, comp_name, password,email) VALUES (?,?,?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);) {
@@ -43,40 +46,54 @@ public class CompanyDBDAO implements CompanyDAO {
 			System.out.println("New company creation succeeded." + company.toString());
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			connection.close();
 		}
 	}
 
 	// checking to see if a company already exists with wanted name
-	public boolean checkCompanyName(Company company) throws Exception {
+	public boolean checkCompanyName(Company company) {
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		Statement statement = connection.createStatement();
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String sql = "SELECT comp_name FROM companys";
-		ResultSet resultSet = statement.executeQuery(sql);
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			ResultSet resultSet = preparedStatement.executeQuery(sql);
 
-		while (resultSet.next()) {
-			String companyName = resultSet.getString("comp_name");
-			names.add(companyName);
-		}
-		for (String name : names) {
-			if (name.equals(company.getCompName())) {
-				return true;
+			while (resultSet.next()) {
+				String companyName = resultSet.getString("comp_name");
+				names.add(companyName);
 			}
+			for (String name : names) {
+				if (name.equals(company.getCompName())) {
+					return true;
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		connection.close();
 		return exists;
 	}
 
 	@Override
-	public void removeCompany(Company company) throws Exception {
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+	public void removeCompany(Company company) {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String couponSQL = String.format("delete from companys where id=?");
 		String couponsCompanySQL = String.format("delete * company_coupon where comp_ID=?");
-		PreparedStatement preparedStatement = connection.prepareStatement(couponSQL);
 		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(couponSQL);
+
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, company.getId());
 			preparedStatement.executeUpdate();
@@ -90,15 +107,19 @@ public class CompanyDBDAO implements CompanyDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			connection.close();
 		}
 
 	}
 
 	@Override
-	public void updateCompany(Company company) throws Exception {
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+	public void updateCompany(Company company) {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = String.format("UPDATE companys set email = ?, password = ? WHERE id = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			connection.setAutoCommit(false);
@@ -110,61 +131,85 @@ public class CompanyDBDAO implements CompanyDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			connection.close();
 		}
 	}
 
 	@Override
-	public Company getCompany(long id) throws Exception {
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+	public Company getCompany(long id) {
+		Company company = new Company();
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = String.format("SELECT comp_Name, password, email FROM companys WHERE id=?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-				String compName = resultSet.getString("comp_Name");
-				String password = resultSet.getString("password");
-				String email = resultSet.getString("email");
-				return new Company(id, compName, password, email);
+				company.setId(id);
+				company.setCompName(resultSet.getString("comp_Name"));
+				company.setPassword(resultSet.getString("password"));
+				company.setEmail(resultSet.getString("email"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			connection.close();
 		}
-		return null;
+		return company;
 	}
 
 	@Override
-	public Collection<Company> getAllCompanys() throws Exception {
+	public Collection<Company> getAllCompanys() {
 		ArrayList<Company> companys = new ArrayList<Company>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
-		Statement statement = connection.createStatement();
-		String sql = "select * from companys";
-		ResultSet resultSet = statement.executeQuery(sql);
-
-		while (resultSet.next()) {
-
-			// int id = resultSet.getInt(1);
-			long id = resultSet.getLong("id");
-			String compName = resultSet.getString("comp_Name");
-			String email = resultSet.getString("email");
-			companys.add(new Company(id, compName, email));
-			System.out.printf("id- %d | name- %s | email - %s\n", id, compName, email);
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		connection.close();
+		String sql = "select * from companys";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			ResultSet resultSet = preparedStatement.executeQuery(sql);
+
+			while (resultSet.next()) {
+
+				// int id = resultSet.getInt(1);
+				long id = resultSet.getLong("id");
+				String compName = resultSet.getString("comp_Name");
+				String email = resultSet.getString("email");
+				companys.add(new Company(id, compName, email));
+				System.out.printf("id- %d | name- %s | email - %s\n", id, compName, email);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return companys;
 	}
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-		return null;
+		ArrayList<Long> couponsID = getCouponsID(companyID);
+		return getCoupons(couponsID);
 	}
 
-	public Company getCompany(String name) throws Exception {
+	public ArrayList<Coupon> getCompanyCoupons() throws Exception {
+		ArrayList<Long> couponsID = getCouponsID(companyID);
+		return getCoupons(couponsID);
+	}
+
+	public Company getCompany(String name) {
 		Company wantedCompany = new Company();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = String.format("SELECT * FROM companys WHERE comp_name = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, name);
@@ -179,25 +224,27 @@ public class CompanyDBDAO implements CompanyDAO {
 				wantedCompany.setPassword(password);
 				wantedCompany.setEmail(email);
 				wantedCompany.setCoupons(getCoupons(getCouponsID(id)));
-				//System.out.println(wantedCompany);
+				// System.out.println(wantedCompany);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			connection.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return wantedCompany;
 	}
 
-	public ArrayList<Coupon> getCompanyCoupons() throws Exception {
-		ArrayList<Long> couponsID = getCouponsID(company.getId());
-		return getCoupons(couponsID);
-	}
-
 	// get all coupon ids created by company
-	public ArrayList<Long> getCouponsID(long id) throws Exception {
+	public ArrayList<Long> getCouponsID(long id) {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String sql = "SELECT coupon_ID from companys_coupon WHERE company_ID = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, id);
@@ -205,15 +252,24 @@ public class CompanyDBDAO implements CompanyDAO {
 			while (resultSet.next()) {
 				couponsID.add(resultSet.getLong("coupon_ID"));
 			}
-			connection.close();
-			return couponsID;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return couponsID;
+
 	}
 
 	// get all coupons the company created
-	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws Exception {
+	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ResultSet resultSet;
 		String sql = "select * from coupons WHERE id = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -229,23 +285,32 @@ public class CompanyDBDAO implements CompanyDAO {
 					String type = resultSet.getString(6);
 					String message = resultSet.getString("message");
 					Double price = resultSet.getDouble("price");
-					String image = resultSet.getString("image");
+					//String image = resultSet.getString("image");
 
 					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				}
 			}
-			connection.close();
-			return coupons;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return coupons;
+
 	}
 
 	@Override
-	public boolean login(String compName, String givenPassword) throws Exception {
+	public boolean login(String compName, String givenPassword) {
 		boolean correctInitials = false;
-		Connection connection = DriverManager.getConnection(main.Database.getDBURL());
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(main.Database.getDBURL());
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String sql = String.format("SELECT id, comp_name, password, email FROM companys WHERE comp_name = ?");
 		String password = null, name = null;
-		long id;
+		long id = 0;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, compName);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -259,10 +324,15 @@ public class CompanyDBDAO implements CompanyDAO {
 			}
 			if (givenPassword.equals(password)) {
 				correctInitials = true;
+				companyID = id;
+			} else {
+				throw new WrongInfoInsertedException("Company with that password doesnt exist.");
 			}
 		} catch (WrongInfoInsertedException e) {
 			e.printStackTrace();
-
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

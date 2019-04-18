@@ -1,15 +1,11 @@
 package main;
 
-import java.time.LocalDate;
-
-import company.Company;
-import coupon.Coupon;
-import coupon.CouponType;
-import customer.Customer;
 import facade.AdminFacade;
+import javabeans.Customer;
 
 public class Test {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws Exception, IllegalAccessException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		System.out.println("Start");

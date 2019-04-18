@@ -1,4 +1,4 @@
-package coupon;
+package javabeans;
 
 public enum CouponType {
 		RESTAURANTS,

@@ -1,13 +1,15 @@
 package exception;
 
-public class EmptyException extends Exception {
+public class EmptyException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private String name;
 
 	public EmptyException() {
+		super();
 	}
 
 	public EmptyException(String name) {
+		super();
 		setName(name);
 	}
 

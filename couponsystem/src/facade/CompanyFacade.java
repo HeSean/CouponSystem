@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import company.Company;
-import company.CompanyDBDAO;
-import coupon.Coupon;
-import coupon.CouponDBDAO;
-import coupon.CouponType;
+import db.CompanyDBDAO;
+import db.CouponDBDAO;
 import exception.NameExistsException;
+import javabeans.Company;
+import javabeans.Coupon;
+import javabeans.CouponType;
 
 public class CompanyFacade implements CouponClientFacade {
 
@@ -18,11 +18,10 @@ public class CompanyFacade implements CouponClientFacade {
 	private CompanyDBDAO companyDBDAO = new CompanyDBDAO();
 
 	public CompanyFacade() {
-		// TODO Auto-generated constructor stub
 	}
 
 	// Method for creating a new coupon
-	public void createCoupon(Coupon coupon, long compID) throws NameExistsException {
+	public void createCoupon(Coupon coupon, long compID) {
 		try {
 			if (!couponDBDAO.checkCouponName(coupon)) {
 				couponDBDAO.createCoupon(coupon);
@@ -32,7 +31,7 @@ public class CompanyFacade implements CouponClientFacade {
 			} else
 				throw new NameExistsException(coupon.getTitle(), coupon);
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 

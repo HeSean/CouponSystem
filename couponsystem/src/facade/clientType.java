@@ -5,7 +5,8 @@ public enum clientType {
 		COMPANY("Company"),
 		CUSTOMER("Customer");
 		
-	   private String clientType;
+	   @SuppressWarnings("unused")
+	private String clientType;
 
        private clientType (String value) {
                this. clientType = value;

@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 
 import exception.WrongInfoInsertedException;
+import exception.EmptyException;
 import exception.NameExistsException;
 
 public class Database {
@@ -17,158 +19,215 @@ public class Database {
 	}
 
 	// Create table method
-	public void createCouponsTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists Coupons (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , title varchar(45), start_Date Date, end_Date Date,  amount int (64), type ENUM(\"RESTAURANTS\",\r\n"
+	public void createCouponsTable()  {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String sql = "CREATE TABLE Coupons (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , title varchar(45)  NOT NULL, start_Date Date  NOT NULL, end_Date Date  NOT NULL,  amount int (64)  NOT NULL, type ENUM(\"RESTAURANTS\",\r\n"
 				+ "		\"ELECTRICITY\",\r\n" + "		\"FOOD\",\r\n" + "		\"HEALTH\",\r\n"
 				+ "		\"SPORTS\",\r\n" + "		\"CAMPING\",\r\n"
-				+ "		\"TRAVELLING\"), message varchar(45), price double, image varchar(45));";
+				+ "		\"TRAVELLING\")  NOT NULL, message varchar(45)  NOT NULL, price double, image varchar(45)  NOT NULL);";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Coupon table succesfully created.");
-			} else
-				throw new NameExistsException("Coupon Table");
-		} catch (NameExistsException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Coupon table succesfully created.");
+		} catch (SQLSyntaxErrorException e) {
+			NameExistsException ee = new NameExistsException("Coupon table");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCustomersTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists Customers (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , cust_name varchar(45), password varchar(45));";
+	public void createCustomersTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "CREATE TABLE Customers (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , cust_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL);";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Customer table succesfully created.");
-			} else
-				throw new NameExistsException("Customer Table");
-		} catch (NameExistsException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Customer table succesfully created.");
+		} catch (SQLSyntaxErrorException e) {
+			NameExistsException ee = new NameExistsException("Customer table");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCompanysTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists companys (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , comp_name varchar(45), password varchar(45), email varchar(45));";
+	public void createCompanysTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "CREATE TABLE companys (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , comp_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL, email varchar(45)  NOT NULL);";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Companys table succesfully created.");
-			} else
-				throw new NameExistsException("Companys Table");
-		} catch (NameExistsException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Companys table succesfully created.");
+		} catch (SQLSyntaxErrorException e) {
+			NameExistsException ee = new NameExistsException("Companys table");
+			ee.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void createCustomerCouponTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String sql = "\r\n" + "CREATE TABLE customers_coupon (\r\n" + "customer_id int NOT NULL ,\r\n"
+				+ "coupon_id int NOT NULL ,    \r\n"
+				+ "FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n"
+				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n"
+				+ "primary key (customer_id, coupon_id)\r\n" + ");";
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.executeUpdate();
+			System.out.println("Customer - Coupon table succesfully created.");
+		} catch (SQLSyntaxErrorException e) {
+			NameExistsException ee = new NameExistsException("Customer - Coupon table");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCustomerCouponTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "\r\n" + 
-				"CREATE TABLE if not exists customers_coupon (\r\n" + 
-				"customer_id int NOT NULL ,\r\n" + 
-				"coupon_id int NOT NULL ,    \r\n" + 
-				"FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n" + 
-				"FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n" + 
-				"primary key (customer_id, coupon_id)\r\n" + 
-				");";
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Customer - Coupon table succesfully created.");
-			} else
-				throw new NameExistsException("Customer - Coupon Table");
-		} catch (NameExistsException e) {
+	public void createCompanysCouponTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public void createCompanysCouponTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "CREATE TABLE if not exists companys_coupon (\r\n" + 
-				"company_id int NOT NULL ,\r\n" + 
-				"coupon_id int NOT NULL,    \r\n" + 
-				"FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n" + 
-				"FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n" + 
-				"primary key (company_id, coupon_id)\r\n" + 
-				");";
+		String sql = "CREATE TABLE companys_coupon (\r\n" + "company_id int NOT NULL ,\r\n"
+				+ "coupon_id int NOT NULL,    \r\n"
+				+ "FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n"
+				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n"
+				+ "primary key (company_id, coupon_id)\r\n" + ");";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Company - Coupon table succesfully created.");
-			} else
-				throw new NameExistsException("Company - Coupon Table");
-		} catch (NameExistsException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Company - Coupon table succesfully created.");
+		} catch (SQLSyntaxErrorException e) {
+			NameExistsException ee = new NameExistsException("Company - Coupon table");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	// drop table method
-	public void dropCouponsTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Coupons";
-
+	public void dropCouponsTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "DROP table Coupons";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Coupon table succesfully dropped.");
-			} else
-				throw new WrongInfoInsertedException("Coupon Table");
-		} catch (WrongInfoInsertedException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Coupon table succesfully dropped.");
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Coupon table does not exist. ");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCustomersTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Customers";
+	public void dropCustomersTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "DROP table Customers";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Customers table succesfully dropped.");
-			} else
-				throw new WrongInfoInsertedException("Customer Table");
-		} catch (WrongInfoInsertedException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Customers table succesfully dropped.");
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers table does not exist. ");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCompanysTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Companys";
-
+	public void dropCompanysTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "DROP table Companys";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Companys table succesfully dropped.");
-			} else
-				throw new WrongInfoInsertedException("Companys Table");
-		} catch (WrongInfoInsertedException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Companys table succesfully dropped.");
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist. ");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCompanyCouponTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Companys_Coupon";
+	public void dropCompanyCouponTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "DROP table Companys_Coupon";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Company_Coupon table succesfully dropped.");
-			} else
-				throw new WrongInfoInsertedException("Company_Coupon Table");
-		} catch (WrongInfoInsertedException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Company_Coupon table succesfully dropped.");
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Company_Coupon table does not exist. ");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCustomerCouponTable() throws Exception {
-		Connection connection = DriverManager.getConnection(getDBURL());
-		String sql = "DROP table if exists Customers_Coupon";
+	public void dropCustomerCouponTable() {
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(getDBURL());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String sql = "DROP table Customers_Coupon";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-			if (preparedStatement.executeUpdate() == 0) {
-				System.out.println("Customer_Coupon table succesfully dropped.");
-			} else
-				throw new WrongInfoInsertedException("Customer_Coupon Table");
-		} catch (WrongInfoInsertedException e) {
+			preparedStatement.executeUpdate();
+			System.out.println("Customer_Coupon table succesfully dropped.");
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers_Coupon table does not exist. ");
+			ee.printStackTrace();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -179,7 +238,8 @@ public class Database {
 		String sql = "ALTER table if exists" + tableName + "CHANGE " + oldColumn + " " + newColumn + " " + type;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			if (preparedStatement.executeUpdate() != 0) {
-				System.out.println("Alter action succesfully --> " + "ALTER table if exists" + tableName + "CHANGE " + oldColumn + " " + newColumn + " " + type);
+				System.out.println("Alter action succesfull --> " + "ALTER table if exists" + tableName + "CHANGE "
+						+ oldColumn + " " + newColumn + " " + type);
 			} else
 				throw new WrongInfoInsertedException("Customer_Coupon Table");
 		} catch (WrongInfoInsertedException e) {

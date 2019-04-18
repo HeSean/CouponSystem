@@ -1,10 +1,10 @@
 package exception;
 
-import company.Company;
-import coupon.Coupon;
-import customer.Customer;
+import javabeans.Company;
+import javabeans.Coupon;
+import javabeans.Customer;
 
-public class NameExistsException extends Exception {
+public class NameExistsException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
@@ -17,8 +17,10 @@ public class NameExistsException extends Exception {
 	}
 
 	public NameExistsException(String name) {
+		super();
 		setName(name);
 	}
+
 	public String getName() {
 		return name;
 	}
@@ -37,10 +39,10 @@ public class NameExistsException extends Exception {
 					+ "\". There is already a customer with that name, Please try again with a different name.";
 		} else if (object instanceof Coupon) {
 			return " \nNameExistsException of Coupon Title - \"" + name
-				+ "\". There is already a coupon with that name, Please try again with a different name.";
-		}
-		else return " \nNameExistsException of " + name
-				+ "\". There is already a " + name + " with that name, Please try again with a different name.";
-		
+					+ "\". There is already a coupon with that name, Please try again with a different name.";
+		} else
+			return " \nNameExistsException of " + name + ". " + name
+					+ " already exists.";
+
 	}
 }

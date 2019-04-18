@@ -3,14 +3,13 @@ package facade;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import coupon.Coupon;
-import coupon.CouponDBDAO;
-import coupon.CouponType;
-import customer.Customer;
-import customer.CustomerDBDAO;
-import exception.WrongInfoInsertedException;
-import exception.ExpiredCouponException;
-import exception.OutOfStockException;
+
+import db.CouponDBDAO;
+import db.CustomerDBDAO;
+import javabeans.Coupon;
+import javabeans.CouponType;
+import javabeans.Customer;
+import exception.CouponPurchaseException;
 
 public class CustomerFacade implements CouponClientFacade {
 
@@ -43,17 +42,17 @@ public class CustomerFacade implements CouponClientFacade {
 	}
 
 	// customer purchase coupon
-	public void purchaseCoupon(Customer customer, Coupon coupon) throws OutOfStockException, ExpiredCouponException {
+	public void purchaseCoupon(Customer customer, Coupon coupon) {
 		try {
 			if ((couponDBDAO.canBuy(customer, coupon)) == 1) {
 				couponDBDAO.purchaseCoupon(customer, coupon);
 			} else if ((couponDBDAO.canBuy(customer, coupon)) == 2) {
-				throw new OutOfStockException(coupon);
+				throw new CouponPurchaseException(coupon, 2);
 			} else if ((couponDBDAO.canBuy(customer, coupon)) == 3) {
-				throw new ExpiredCouponException(coupon, customer);
+				throw new CouponPurchaseException(coupon, 3);
 			}
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 
@@ -90,21 +89,7 @@ public class CustomerFacade implements CouponClientFacade {
 				iterator.remove();
 			}
 		}
-		//return coupons;
-		
-		// through java beans
-		ArrayList<Coupon> couponsz = new ArrayList<Coupon>();
-		couponsz = customer.getCoupons();
-		if (!couponsz.isEmpty()) {
-		Iterator<Coupon> iteratorz = couponsz.iterator();
-		while (iteratorz.hasNext()) {
-			Coupon coupon = (Coupon) iteratorz.next();
-			if (!couponType.equals(coupon.getType())) {
-				iteratorz.remove();
-			}
-		}
-		return couponsz;
-		} else throw new WrongInfoInsertedException("No coupons found for this customer - " + customer.getCustName());
+		return coupons;
 	} 
 	
 	

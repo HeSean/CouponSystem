@@ -1,8 +1,9 @@
-package company;
+package db;
 
 import java.util.Collection;
 
-import coupon.Coupon;
+import javabeans.Company;
+import javabeans.Coupon;
 
 public interface CompanyDAO {
 		public void createCompany (Company company) throws Exception;

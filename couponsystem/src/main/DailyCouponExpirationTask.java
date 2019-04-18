@@ -1,6 +1,6 @@
 package main;
 
-import coupon.CouponDBDAO;
+import db.CouponDBDAO;
 import exception.EmptyException;
 
 public class DailyCouponExpirationTask implements Runnable {
@@ -28,7 +28,6 @@ public class DailyCouponExpirationTask implements Runnable {
 					throw new EmptyException("no coupons to run thread on..");
 				}
 			} catch (EmptyException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
