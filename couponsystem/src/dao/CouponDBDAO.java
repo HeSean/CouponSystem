@@ -1,4 +1,4 @@
-package db;
+package dao;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -14,28 +14,33 @@ import java.util.Collection;
 
 import exception.CouponPurchaseException;
 import exception.EmptyException;
+import exception.FailedConnectionException;
 import javabeans.Company;
 import javabeans.Coupon;
 import javabeans.CouponType;
 import javabeans.Customer;
+import main.ConnectionPool;
 
 public class CouponDBDAO implements CouponDAO {
 
-	// private Coupon coupon;
+	private ConnectionPool pool;
 	private CompanyDBDAO companyDBDAO;
 
 	public CouponDBDAO() {
+		try {
+			pool = ConnectionPool.getInstance();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void createCoupon(Coupon coupon) {
-		// this.coupon = coupon;
+	public void createCoupon(Coupon coupon) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format(
 				"INSERT INTO coupons (id, title, start_Date, end_Date, amount, type, message, price, image) VALUES (?,?,?,?,?,?,?,?,?)");
@@ -56,18 +61,19 @@ public class CouponDBDAO implements CouponDAO {
 			System.out.println("\nNew coupon submit into Coupons table succeeded.\n" + coupon);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	// checking to see if a coupon already exists with new name
-	public boolean checkCouponName(Coupon coupon) {
+	public boolean checkCouponName(Coupon coupon) throws FailedConnectionException {
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "SELECT title FROM coupons";
@@ -85,18 +91,20 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return exists;
 	}
 
 	// delete one item from DB stock on purchase
-	public void deleteFromStockDB(Coupon boughtCoupon) {
+	public void deleteFromStockDB(Coupon boughtCoupon) throws FailedConnectionException {
 		Connection connection = null;
 		if (boughtCoupon.getAmount() > 0) {
 			try {
-				connection = DriverManager.getConnection(main.Database.getDBURL());
-			} catch (SQLException e1) {
-				e1.printStackTrace();
+				connection = pool.getConnection();
+			} catch (FailedConnectionException e) {
+				e.printStackTrace();
 			}
 		}
 		String sql = String.format("UPDATE coupons SET amount = amount - 1 WHERE id = ?");
@@ -107,6 +115,8 @@ public class CouponDBDAO implements CouponDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
@@ -159,13 +169,12 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	// insert new created coupon to company-coupon table
-	public void insertCouponToCompanysCouponJoinTable(long couponID, long compID) {
+	public void insertCouponToCompanysCouponJoinTable(long couponID, long compID) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sqlCompanyCoupon = "INSERT INTO companys_coupon (company_id, coupon_id) VALUES (?,?)";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCompanyCoupon,
@@ -176,17 +185,18 @@ public class CouponDBDAO implements CouponDAO {
 			System.out.println("\nNew coupon submit into Company - Coupon table succeeded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	// insert new created coupon to company-coupon table
-	public void insertCouponToCustomersCouponJoinTable(long couponID, long custID) {
+	public void insertCouponToCustomersCouponJoinTable(long couponID, long custID) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sqlCustomerCoupon = "INSERT INTO customers_coupon (customer_id, coupon_id) VALUES (?,?)";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlCustomerCoupon,
@@ -197,19 +207,23 @@ public class CouponDBDAO implements CouponDAO {
 			System.out.println("\nNew coupon submit into Customer - Coupon table succeeded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public void removeCoupon(Coupon coupon) {
+	public void removeCoupon(Coupon coupon) throws FailedConnectionException {
+		if (!doesCouponExist(coupon.getId())) {
+			throw new EmptyException("Coupon ID does not exist in database.");
+		}
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
-		String couponsSQL = String.format("delete from coupons where id=?");
+		String couponsSQL = String.format("delete from coupons where id = ?");
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
 			connection.setAutoCommit(false);
@@ -219,37 +233,18 @@ public class CouponDBDAO implements CouponDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-	}
-
-	// remove coupon by id
-	public void removeCouponByID(long id) {
-		Connection connection = null;
-		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		String couponsSQL = String.format("delete from coupons where id=?");
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
-			preparedStatement.setLong(1, id);
-			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from Coupons Table of coupon - " + id);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	// find expired coupons from db if exists
-	public void findExpiredCoupons() {
+	public void findExpiredCoupons() throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("select id from coupons WHERE end_Date < current_date();");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -260,17 +255,66 @@ public class CouponDBDAO implements CouponDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
-	@Override
-	public void updateCoupon(Coupon coupon) {
+	// remove coupon by id
+	public void removeCouponByID(long id) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
+		String couponsSQL = String.format("delete from coupons where id=?");
+		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
+			preparedStatement.setLong(1, id);
+			preparedStatement.executeUpdate();
+			System.out.println("Delete succesful from Coupons Table of coupon - " + id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
+		}
+	}
+
+	public boolean doesCouponExist(long id) throws FailedConnectionException {
+		boolean doesCouponExist = false;
+		Connection connection = null;
+		try {
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
+		String sql = String.format("SELECT title FROM coupons WHERE id=?");
+		String title = null;
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, id);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				title = resultSet.getString("title");
+			}
+			if (title != null) {
+				doesCouponExist = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
+		}
+		return doesCouponExist;
+	}
+
+	@Override
+	public void updateCoupon(Coupon coupon) throws FailedConnectionException {
+		Connection connection = null;
+		try {
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format(
 				"UPDATE coupons set title = ?, start_Date = ?, end_Date = ?, amount = ?, type = ?, message = ?, price = ?, image = ? WHERE id = ?");
@@ -291,18 +335,19 @@ public class CouponDBDAO implements CouponDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public Coupon getCoupon(long id) {
+	public Coupon getCoupon(long id) throws FailedConnectionException {
 		Coupon wantedCoupon = new Coupon();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format(
 				"SELECT title, start_Date, end_Date, amount, type, message, price, image FROM coupons WHERE id=?");
@@ -333,25 +378,24 @@ public class CouponDBDAO implements CouponDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return wantedCoupon;
 	}
 
 	@Override
-	public Collection<Coupon> getAllCoupons() {
+	public Collection<Coupon> getAllCoupons() throws FailedConnectionException {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
-
 		String sql = "select * from coupons";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			ResultSet resultSet = preparedStatement.executeQuery(sql);
-
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String title = resultSet.getString("title");
@@ -361,7 +405,7 @@ public class CouponDBDAO implements CouponDAO {
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
-				//String image = resultSet.getString("image");
+				// String image = resultSet.getString("image");
 
 				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				// System.out.printf(
@@ -372,21 +416,21 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 	}
 
 	@Override
-	public Collection<Coupon> getCouponByType(CouponType wantedType) {
+	public Collection<Coupon> getCouponByType(CouponType wantedType) throws FailedConnectionException {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
-
 		String sql = "select * from coupons WHERE type = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, wantedType.name());
@@ -409,20 +453,20 @@ public class CouponDBDAO implements CouponDAO {
 						id, title, startDate, endDate, amount, type, message, price, image);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 
 	}
 
-	public Collection<Coupon> getCouponByPrice(double wantedPrice) {
+	public Collection<Coupon> getCouponByPrice(double wantedPrice) throws FailedConnectionException {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "select * from coupons WHERE price < ?";
@@ -447,20 +491,20 @@ public class CouponDBDAO implements CouponDAO {
 						id, title, startDate, endDate, amount, type, message, price, image);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 
 	}
 
-	public Collection<Coupon> getCouponByDate(LocalDate wantedDate) {
+	public Collection<Coupon> getCouponByDate(LocalDate wantedDate) throws FailedConnectionException {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "select * from coupons WHERE end_Date > ?";
@@ -486,8 +530,9 @@ public class CouponDBDAO implements CouponDAO {
 						id, title, startDate, endDate, amount, type, message, price, image);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 
@@ -497,14 +542,13 @@ public class CouponDBDAO implements CouponDAO {
 	// 1 = yes
 	// 2 = no coupons left in stock (amount <= 0)
 	// 3 = coupon expired.
-	public int canBuy(Customer customer, Coupon coupon) {
+	public int canBuy(Customer customer, Coupon coupon) throws FailedConnectionException {
 		// boolean isOkayToBuy = true;
 		int msg = 1;
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		int amount = 0;
@@ -532,21 +576,23 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLSyntaxErrorException e) {
 			EmptyException ee = new EmptyException("Coupons table does not exist. ");
 			ee.printStackTrace();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return msg;
 
 	}
 
 	// purchasing coupon
-	public void purchaseCoupon(Customer customer, Coupon coupon) {
+	public void purchaseCoupon(Customer customer, Coupon coupon) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("INSERT INTO customers_coupon (customer_ID, coupon_ID) VALUES (?,?)");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -558,14 +604,17 @@ public class CouponDBDAO implements CouponDAO {
 			customer.addCoupon(coupon);
 			deleteFromStockDB(coupon);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			CouponPurchaseException c = new CouponPurchaseException("Customer cannot buy more than one of the same coupon.");
+			CouponPurchaseException c = new CouponPurchaseException(
+					"Customer cannot buy more than one of the same coupon.");
 			c.printStackTrace();
 		} catch (SQLSyntaxErrorException e) {
 			EmptyException ee = new EmptyException("Customers_Coupon table does not exist. ");
 			ee.printStackTrace();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
-	
+
 }

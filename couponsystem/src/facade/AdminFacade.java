@@ -2,8 +2,10 @@ package facade;
 
 import java.util.Collection;
 
-import db.CompanyDBDAO;
-import db.CustomerDBDAO;
+import dao.CompanyDBDAO;
+import dao.CouponDBDAO;
+import dao.CustomerDBDAO;
+import exception.FailedConnectionException;
 import exception.NameExistsException;
 import javabeans.Company;
 import javabeans.Coupon;
@@ -13,25 +15,25 @@ public class AdminFacade implements CouponClientFacade {
 
 	private static final String ADMINUSER = "admin";
 	private static final String ADMINPASSWORD = "1234";
-	private CompanyDBDAO companyDBDAO;
-	private CustomerDBDAO customerDBDAO;
+	private CompanyDBDAO companyDBDAO= new CompanyDBDAO();
+	private CustomerDBDAO customerDBDAO  = new CustomerDBDAO();
+	private CouponDBDAO couponDBDAO = new CouponDBDAO();
 
-	public AdminFacade() throws Exception {
-		companyDBDAO = new CompanyDBDAO();
-		customerDBDAO = new CustomerDBDAO();
+	public AdminFacade() {
+
 	}
-	
+
 	@Override
-	public  CouponClientFacade login(String name, String password, clientType c) throws Exception {
+	public CouponClientFacade login(String name, String password, clientType c) {
 		if (ADMINUSER.equals(name) && ADMINPASSWORD.equals(password)) {
 			System.out.println("Welcome admin.");
 			return this;
-		} else 
+		} else
 			return null;
 	}
 
 	// Company Methods
-	public void createCompany(Company company) throws NameExistsException {
+	public void createCompany(Company company) {
 		try {
 			if (!companyDBDAO.checkCompanyName(company)) {
 				companyDBDAO.createCompany(company);
@@ -42,25 +44,24 @@ public class AdminFacade implements CouponClientFacade {
 		}
 	}
 
-	public void removeCompany(Company company) throws Exception {
+	public void removeCompany(Company company) throws FailedConnectionException {
 		companyDBDAO.removeCompany(company);
 	}
 
-	public void updateCompany (Company company) throws Exception{
+	public void updateCompany(Company company) throws FailedConnectionException {
 		companyDBDAO.updateCompany(company);
 	}
 
-
-	public Company getCompany(long id) throws Exception {
+	public Company getCompany(long id) throws FailedConnectionException {
 		return companyDBDAO.getCompany(id);
 	}
 
-	public void getAllCompanies() throws Exception {
+	public void getAllCompanies() throws FailedConnectionException {
 		companyDBDAO.getAllCompanys();
 	}
 
 	// Customer Methods
-	public void createCustomer(Customer customer) throws NameExistsException {
+	public void createCustomer(Customer customer) {
 		try {
 			if (!customerDBDAO.checkCustomerName(customer)) {
 				customerDBDAO.createCustomer(customer);
@@ -71,24 +72,28 @@ public class AdminFacade implements CouponClientFacade {
 		}
 	}
 
-	public void removeCustomer(Customer customer) throws Exception {
+	public void removeCustomer(Customer customer) throws FailedConnectionException {
 		customerDBDAO.removeCustomer(customer);
 	}
 
-	public void updateCustomer(Customer customer) throws Exception {
+	public void updateCustomer(Customer customer) throws FailedConnectionException {
 		customerDBDAO.updateCustomer(customer);
 	}
 
-	public Customer getCustomer(long id) throws Exception {
+	public Customer getCustomer(long id) throws FailedConnectionException {
 		return customerDBDAO.getCustomer(id);
 	}
 
-	public Collection<Customer> getAllCustomers() throws Exception {
+	public Collection<Customer> getAllCustomers() throws FailedConnectionException {
 		return customerDBDAO.getAllCustomers();
 	}
-	
-	public Collection<Coupon> getAllCoupons() throws Exception{
-		return null;
+
+	public Collection<Coupon> getAllCoupons()   {
+		try {
+			return couponDBDAO.getAllCoupons();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		} return null;
 	}
 
 }

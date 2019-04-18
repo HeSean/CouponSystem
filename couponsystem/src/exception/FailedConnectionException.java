@@ -1,13 +1,15 @@
 package exception;
 
-public class NotExistsException extends Exception {
+public class FailedConnectionException extends Exception {
 	private static final long serialVersionUID = 1L;
 	private String msg;
 
-	public NotExistsException() {
+	public FailedConnectionException() {
+		super();
 	}
 
-	public NotExistsException(String msg) {
+	public FailedConnectionException(String msg) {
+		super();
 		setMsg(msg);
 	}
 
@@ -22,9 +24,9 @@ public class NotExistsException extends Exception {
 	@Override
 	public String toString() {
 		if (msg != null) {
-			return "NotExistsException - " + msg;
+			return "FailedConnectionException - " + msg;
 		} else 
-		return "NotExistsException - No objects were found in list";
+		return "FailedConnectionException - Failed to connect to database.";
 	}
 
 }

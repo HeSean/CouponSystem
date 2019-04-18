@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import db.CompanyDBDAO;
-import db.CouponDBDAO;
+import dao.CompanyDBDAO;
+import dao.CouponDBDAO;
 import exception.NameExistsException;
 import javabeans.Company;
 import javabeans.Coupon;
@@ -49,7 +49,7 @@ public class CompanyFacade implements CouponClientFacade {
 		return couponDBDAO.getCoupon(id);
 	}
 
-	public ArrayList<Coupon> getAllCoupon() throws Exception {
+	public ArrayList<Coupon> getAllCoupons() throws Exception {
 		ArrayList<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
 		return companyDBDAO.getCoupons(couponsID);
 	}

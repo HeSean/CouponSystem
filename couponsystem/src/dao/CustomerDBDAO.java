@@ -1,7 +1,6 @@
-package db;
+package dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,24 +10,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import exception.EmptyException;
+import exception.FailedConnectionException;
 import exception.WrongInfoInsertedException;
 import javabeans.Coupon;
 import javabeans.Customer;
+import main.ConnectionPool;
 
 public class CustomerDBDAO implements CustomerDAO {
 
-	public CustomerDBDAO() {
+	private ConnectionPool pool;
 
+	public CustomerDBDAO() {
+		try {
+			pool = ConnectionPool.getInstance();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void createCustomer(Customer customer) {
+	public void createCustomer(Customer customer) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		// String sql = String.format("INSERT INTO customers (id, cust_Name, password)
 		// VALUES (?,?,?)");
@@ -45,17 +51,19 @@ public class CustomerDBDAO implements CustomerDAO {
 			System.out.println("New customer creation succeeded." + customer.toString());
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
-	public boolean checkCustomerName(Customer customer) { // checking if a customer already exists with name
+	public boolean checkCustomerName(Customer customer) throws FailedConnectionException { // checking if a customer
+																							// already exists with name
 		boolean exists = false;
 		ArrayList<String> names = new ArrayList<>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "SELECT cust_name FROM customers";
@@ -73,18 +81,19 @@ public class CustomerDBDAO implements CustomerDAO {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return exists;
 	}
 
 	@Override
-	public void removeCustomer(Customer customer) {
+	public void removeCustomer(Customer customer) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// Can't get connection
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("delete from customers where id = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -96,17 +105,18 @@ public class CustomerDBDAO implements CustomerDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public void updateCustomer(Customer customer) {
+	public void updateCustomer(Customer customer) throws FailedConnectionException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("UPDATE customers set password = ? WHERE id = ?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -118,18 +128,19 @@ public class CustomerDBDAO implements CustomerDAO {
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public Customer getCustomer(long id) {
+	public Customer getCustomer(long id) throws FailedConnectionException {
 		Customer wantedCustomer = new Customer();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("SELECT cust_Name, password FROM customers WHERE id=?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -146,8 +157,9 @@ public class CustomerDBDAO implements CustomerDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return wantedCustomer;
 	}
@@ -156,10 +168,9 @@ public class CustomerDBDAO implements CustomerDAO {
 		Customer wantedCustomer = new Customer();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("SELECT * FROM customers WHERE cust_name=?");
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -184,13 +195,12 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	@Override
-	public Collection<Customer> getAllCustomers() {
+	public Collection<Customer> getAllCustomers() throws FailedConnectionException {
 		ArrayList<Customer> customers = new ArrayList<Customer>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "select * from customers";
@@ -205,19 +215,20 @@ public class CustomerDBDAO implements CustomerDAO {
 			}
 
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return customers;
 	}
 
 	// get all coupon ids bought by customer
-	public ArrayList<Long> getCouponsID(long wantedID) {
+	public ArrayList<Long> getCouponsID(long wantedID) throws FailedConnectionException {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		String sql = "SELECT coupon_ID from customers_coupon WHERE customer_ID = ?";
@@ -230,19 +241,19 @@ public class CustomerDBDAO implements CustomerDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
 		}
 		return couponsID;
-
 	}
 
 	// get all coupons the customer purchased
-	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) {
+	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws FailedConnectionException {
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
 		ResultSet resultSet;
@@ -260,31 +271,29 @@ public class CustomerDBDAO implements CustomerDAO {
 					String type = resultSet.getString(6);
 					String message = resultSet.getString("message");
 					Double price = resultSet.getDouble("price");
-					//String image = resultSet.getString("image");
-
+					// String image = resultSet.getString("image");
 					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 
 	}
 
 	@Override
-	public Collection<Coupon> getAllCoupons(long wantedID) {
+	public Collection<Coupon> getAllCoupons(long wantedID) throws FailedConnectionException {
 		ArrayList<Long> couponsID = new ArrayList<Long>();
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
-
 		String sql = "select * from customer_coupon WHERE customer_id = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setLong(1, wantedID);
@@ -302,38 +311,38 @@ public class CustomerDBDAO implements CustomerDAO {
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
-				//String image = resultSet.getString("image");
+				// String image = resultSet.getString("image");
 
 				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally {
+			pool.returnConnection(connection);
 		}
 		return coupons;
 
 	}
 
 	@Override
-	public boolean login(String custName, String givenPassword) {
+	public boolean login(String custName, String givenPassword) throws FailedConnectionException {
 		boolean correctInitials = false;
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(main.Database.getDBURL());
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
 		}
 		String sql = String.format("SELECT id, cust_name, password FROM customers WHERE cust_name = ?");
 		String password = null, name = null;
-		//long id;
+		// long id;
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, custName);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				password = resultSet.getString("password");
 				name = resultSet.getString("cust_name");
-			//	id = resultSet.getLong("id");
+				// id = resultSet.getLong("id");
 			}
 			if (name == null) {
 				throw new WrongInfoInsertedException("Customer with that name doesnt exist.");
@@ -350,6 +359,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally {
+			pool.returnConnection(connection);
 		}
 		return correctInitials;
 	}

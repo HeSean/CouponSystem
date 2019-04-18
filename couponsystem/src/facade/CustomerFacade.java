@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import db.CouponDBDAO;
-import db.CustomerDBDAO;
+import dao.CouponDBDAO;
+import dao.CustomerDBDAO;
 import javabeans.Coupon;
 import javabeans.CouponType;
 import javabeans.Customer;
@@ -18,7 +18,7 @@ public class CustomerFacade implements CouponClientFacade {
 	private CustomerDBDAO customerDBDAO = new CustomerDBDAO();
 
 	public CustomerFacade() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public void createCustomer(Customer customer) throws Exception {
@@ -75,8 +75,6 @@ public class CustomerFacade implements CouponClientFacade {
 	// get customers purchase history By Type
 	public Collection<Coupon> getAllPurchasedCouponsByType(CouponType couponType) throws Exception {
 		System.out.println( "Previously purchased coupons of type " + couponType + " by customer " + customer.getCustName() + " are -");
-		
-		// through db
 		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(customer.getId());
 		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
 		if (!couponsID.isEmpty()) {

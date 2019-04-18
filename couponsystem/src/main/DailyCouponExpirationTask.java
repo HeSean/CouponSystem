@@ -1,14 +1,15 @@
 package main;
 
-import db.CouponDBDAO;
+import dao.CouponDBDAO;
 import exception.EmptyException;
+import exception.FailedConnectionException;
 
 public class DailyCouponExpirationTask implements Runnable {
 
 	private static boolean running = true;
 	private CouponDBDAO couponDBDAO;
 
-	public DailyCouponExpirationTask() {
+	public DailyCouponExpirationTask() throws FailedConnectionException {
 		couponDBDAO = new CouponDBDAO();
 	}
 

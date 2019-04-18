@@ -19,7 +19,7 @@ public class Database {
 	}
 
 	// Create table method
-	public void createCouponsTable()  {
+	public void createCouponsTable() throws NameExistsException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -36,14 +36,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Coupon table succesfully created.");
 		} catch (SQLSyntaxErrorException e) {
-			NameExistsException ee = new NameExistsException("Coupon table");
-			ee.printStackTrace();
+			throw new NameExistsException("Coupon table");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCustomersTable() {
+	public void createCustomersTable() throws NameExistsException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -56,14 +55,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Customer table succesfully created.");
 		} catch (SQLSyntaxErrorException e) {
-			NameExistsException ee = new NameExistsException("Customer table");
-			ee.printStackTrace();
+			throw new NameExistsException("Customer table");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCompanysTable() {
+	public void createCompanysTable() throws NameExistsException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -76,15 +74,14 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Companys table succesfully created.");
 		} catch (SQLSyntaxErrorException e) {
-			NameExistsException ee = new NameExistsException("Companys table");
-			ee.printStackTrace();
+			throw new NameExistsException("Companys table");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public void createCustomerCouponTable() {
+	public void createCustomerCouponTable() throws NameExistsException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -102,19 +99,17 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Customer - Coupon table succesfully created.");
 		} catch (SQLSyntaxErrorException e) {
-			NameExistsException ee = new NameExistsException("Customer - Coupon table");
-			ee.printStackTrace();
+			throw new NameExistsException("Customer - Coupon table");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createCompanysCouponTable() {
+	public void createCompanysCouponTable() throws NameExistsException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String sql = "CREATE TABLE companys_coupon (\r\n" + "company_id int NOT NULL ,\r\n"
@@ -127,15 +122,14 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Company - Coupon table succesfully created.");
 		} catch (SQLSyntaxErrorException e) {
-			NameExistsException ee = new NameExistsException("Company - Coupon table");
-			ee.printStackTrace();
+			throw new NameExistsException("Company - Coupon table");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	// drop table method
-	public void dropCouponsTable() {
+	public void dropCouponsTable() throws EmptyException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -147,14 +141,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Coupon table succesfully dropped.");
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Coupon table does not exist. ");
-			ee.printStackTrace();
+			throw new EmptyException("Coupon table does not exist. ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCustomersTable() {
+	public void dropCustomersTable() throws EmptyException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -166,14 +159,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Customers table succesfully dropped.");
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Customers table does not exist. ");
-			ee.printStackTrace();
+			throw new EmptyException("Customers table does not exist. ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCompanysTable() {
+	public void dropCompanysTable() throws EmptyException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -185,14 +177,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Companys table succesfully dropped.");
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Companys table does not exist. ");
-			ee.printStackTrace();
+			throw new EmptyException("Companys table does not exist. ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCompanyCouponTable() {
+	public void dropCompanyCouponTable() throws EmptyException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -205,14 +196,13 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Company_Coupon table succesfully dropped.");
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Company_Coupon table does not exist. ");
-			ee.printStackTrace();
+			throw new EmptyException("Company_Coupon table does not exist. ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void dropCustomerCouponTable() {
+	public void dropCustomerCouponTable() throws EmptyException {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(getDBURL());
@@ -225,8 +215,7 @@ public class Database {
 			preparedStatement.executeUpdate();
 			System.out.println("Customer_Coupon table succesfully dropped.");
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Customers_Coupon table does not exist. ");
-			ee.printStackTrace();
+			throw new EmptyException("Customers_Coupon table does not exist. ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

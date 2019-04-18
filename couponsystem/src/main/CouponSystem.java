@@ -1,5 +1,6 @@
 package main;
 
+import exception.FailedConnectionException;
 import facade.AdminFacade;
 import facade.CompanyFacade;
 import facade.CouponClientFacade;
@@ -9,23 +10,23 @@ import facade.clientType;
 // singleton
 public class CouponSystem {
 
-	private static  CouponSystem couponSystem = null;
+	private static  CouponSystem instance = null;
 	private Thread update;
 	private DailyCouponExpirationTask runnable;
 	private AdminFacade adminFacade;
 	private CustomerFacade customerFacade;
 	private CompanyFacade companyFacade;
 
-	private CouponSystem() {
+	private CouponSystem() throws FailedConnectionException {
 		runnable = new DailyCouponExpirationTask();
 		update = new Thread(runnable);
 	}
 
-	public static CouponSystem getInstance() {
-		if (couponSystem == null) {
-			couponSystem = new CouponSystem();
+	public static CouponSystem getInstance() throws FailedConnectionException {
+		if (instance == null) {
+			instance = new CouponSystem();
 		}
-		return couponSystem;
+		return instance;
 	}
 
 	public void startCouponsUpdater() {
