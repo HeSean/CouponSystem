@@ -8,6 +8,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import exception.EmptyException;
 import exception.FailedConnectionException;
@@ -62,7 +63,7 @@ public class CompanyDBDAO implements CompanyDAO {
 	// checking to see if a company already exists with wanted name
 	public boolean checkCompanyName(Company company) throws FailedConnectionException {
 		boolean exists = false;
-		ArrayList<String> names = new ArrayList<>();
+		LinkedHashSet<String> names = new LinkedHashSet<>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -175,7 +176,7 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Company> getAllCompanys() throws FailedConnectionException {
-		ArrayList<Company> companys = new ArrayList<Company>();
+		LinkedHashSet<Company> companys = new LinkedHashSet<Company>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -205,12 +206,12 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-		ArrayList<Long> couponsID = getCouponsID(companyID);
+		LinkedHashSet<Long> couponsID = getCouponsID(companyID);
 		return getCoupons(couponsID);
 	}
 
-	public ArrayList<Coupon> getCompanyCoupons() throws Exception {
-		ArrayList<Long> couponsID = getCouponsID(companyID);
+	public Collection<Coupon> getCompanyCoupons() throws Exception {
+		LinkedHashSet<Long> couponsID = getCouponsID(companyID);
 		return getCoupons(couponsID);
 	}
 
@@ -247,8 +248,8 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	// get all coupon ids created by company
-	public ArrayList<Long> getCouponsID(long id) throws FailedConnectionException {
-		ArrayList<Long> couponsID = new ArrayList<Long>();
+	public LinkedHashSet<Long> getCouponsID(long id) throws FailedConnectionException {
+		LinkedHashSet<Long> couponsID = new LinkedHashSet<Long>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -272,8 +273,8 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	// get all coupons the company created
-	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+	public Collection<Coupon> getCoupons(LinkedHashSet<Long> ids) throws FailedConnectionException {
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();

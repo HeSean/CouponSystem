@@ -6,14 +6,12 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import exception.FailedConnectionException;
 
 public class ConnectionPool {
 
 	/**
-	 * Singleton Connect to DB server and DB url using parameters from file. pool of
-	 * 10 connections + get url string from file.
+	 * Singleton Connect to DB . pool of 10 connections + get url string from file.
 	 **/
 
 	private static ConnectionPool instance;
@@ -117,5 +115,6 @@ public class ConnectionPool {
 				throw new FailedConnectionException("Connections: Close All Connection: Error!");
 			}
 		}
+		System.out.println("Closed all open connections.");
 	}
 }

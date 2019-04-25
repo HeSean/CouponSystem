@@ -1,8 +1,8 @@
 package facade;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import dao.CompanyDBDAO;
 import dao.CouponDBDAO;
@@ -49,8 +49,8 @@ public class CompanyFacade implements CouponClientFacade {
 		return couponDBDAO.getCoupon(id);
 	}
 
-	public ArrayList<Coupon> getAllCoupons() throws Exception {
-		ArrayList<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
+	public Collection<Coupon> getAllCoupons() throws Exception {
+		LinkedHashSet<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
 		return companyDBDAO.getCoupons(couponsID);
 	}
 

@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import exception.CouponPurchaseException;
 import exception.EmptyException;
@@ -69,7 +69,7 @@ public class CouponDBDAO implements CouponDAO {
 	// checking to see if a coupon already exists with new name
 	public boolean checkCouponName(Coupon coupon) throws FailedConnectionException {
 		boolean exists = false;
-		ArrayList<String> names = new ArrayList<>();
+		LinkedHashSet<String> names = new LinkedHashSet<>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -153,7 +153,7 @@ public class CouponDBDAO implements CouponDAO {
 				}
 				// updating current coupons list to remove one item from coupon amount
 				wantedCompany = companyDBDAO.getCompany(companyName);
-				ArrayList<Coupon> list = (ArrayList<Coupon>) wantedCompany.getCoupons();
+				LinkedHashSet<Coupon> list = (LinkedHashSet<Coupon>) wantedCompany.getCoupons();
 				for (Coupon coupon : list) {
 					if (coupon.equals(boughtCoupon)) {
 						coupon.setAmount(newAmount);
@@ -386,7 +386,7 @@ public class CouponDBDAO implements CouponDAO {
 
 	@Override
 	public Collection<Coupon> getAllCoupons() throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -424,7 +424,7 @@ public class CouponDBDAO implements CouponDAO {
 
 	@Override
 	public Collection<Coupon> getCouponByType(CouponType wantedType) throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -462,7 +462,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	public Collection<Coupon> getCouponByPrice(double wantedPrice) throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -500,7 +500,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	public Collection<Coupon> getCouponByDate(LocalDate wantedDate) throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();

@@ -3,6 +3,7 @@ package facade;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import dao.CouponDBDAO;
 import dao.CustomerDBDAO;
@@ -57,17 +58,17 @@ public class CustomerFacade implements CouponClientFacade {
 	}
 
 	public Collection<Coupon> getCouponsPurchaseHistory() throws Exception {
-		ArrayList<Long> couponsID = customerDBDAO.getCouponsID(customer.getId());
+		Collection<Long> couponsID = customerDBDAO.getCouponsID(customer.getId());
 		return customerDBDAO.getCoupons(couponsID);
 	}
 	
 	
 	// get customers entire purchase history
 	public Collection<Coupon> getAllPurchasedHistory(long id) throws Exception {
-		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(id);
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Long> couponsID = (LinkedHashSet<Long>) customerDBDAO.getCouponsID(id);
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		if (!couponsID.isEmpty()) {
-			coupons = (ArrayList<Coupon>) customerDBDAO.getCoupons(couponsID);
+			coupons = (LinkedHashSet<Coupon>) customerDBDAO.getCoupons(couponsID);
 		}
 		return coupons;
 	}

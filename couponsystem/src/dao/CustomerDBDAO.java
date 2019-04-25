@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import exception.EmptyException;
 import exception.FailedConnectionException;
@@ -59,7 +59,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	public boolean checkCustomerName(Customer customer) throws FailedConnectionException { // checking if a customer
 																							// already exists with name
 		boolean exists = false;
-		ArrayList<String> names = new ArrayList<>();
+		LinkedHashSet<String> names = new LinkedHashSet<>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -152,7 +152,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				wantedCustomer.setId(id);
 				wantedCustomer.setCustName(custName);
 				wantedCustomer.setPassword(password);
-				wantedCustomer.setCoupons((ArrayList<Coupon>) getCoupons((ArrayList<Long>) getCouponsID(id)));
+				wantedCustomer.setCoupons((LinkedHashSet<Coupon>) getCoupons((LinkedHashSet<Long>) getCouponsID(id)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -196,7 +196,7 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public Collection<Customer> getAllCustomers() throws FailedConnectionException {
-		ArrayList<Customer> customers = new ArrayList<Customer>();
+		LinkedHashSet<Customer> customers = new LinkedHashSet<Customer>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -223,8 +223,8 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	// get all coupon ids bought by customer
-	public ArrayList<Long> getCouponsID(long wantedID) throws FailedConnectionException {
-		ArrayList<Long> couponsID = new ArrayList<Long>();
+	public Collection<Long> getCouponsID(long wantedID) throws FailedConnectionException {
+		LinkedHashSet<Long> couponsID = new LinkedHashSet<Long>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -239,7 +239,6 @@ public class CustomerDBDAO implements CustomerDAO {
 				couponsID.add(resultSet.getLong("coupon_id"));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			pool.returnConnection(connection);
@@ -248,8 +247,8 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	// get all coupons the customer purchased
-	public ArrayList<Coupon> getCoupons(ArrayList<Long> ids) throws FailedConnectionException {
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+	public Collection<Coupon> getCoupons(Collection<Long> ids) throws FailedConnectionException {
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
@@ -286,8 +285,8 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public Collection<Coupon> getAllCoupons(long wantedID) throws FailedConnectionException {
-		ArrayList<Long> couponsID = new ArrayList<Long>();
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Long> couponsID = new LinkedHashSet<Long>();
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();

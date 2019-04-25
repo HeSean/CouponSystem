@@ -16,8 +16,8 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Start.");
+		CouponSystem.getInstance().startCouponsUpdater();
 
-		// ConnectionPool.getInstance().closeAllConnections();
 		// Database database = new Database();
 		// database.dropCompanyCouponTable();
 		// database.dropCustomerCouponTable();
@@ -50,8 +50,6 @@ public class Testing {
 		AdminFacade adminFacade = new AdminFacade();
 		CompanyFacade companyFacade = new CompanyFacade();
 		CustomerFacade customerFacade = new CustomerFacade();
-
-		// CouponSystem.getInstance().startCouponsUpdater();
 
 		// adminFacade.createCompany(company1);
 		// adminFacade.createCompany(company2);
@@ -116,10 +114,12 @@ public class Testing {
 		// customerFacade.purchaseCoupon(customer4, coupon1);
 		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
 		System.out.println(customerFacade.getCouponsPurchaseHistory());
+
 		//
-		// customerFacade.login("Maya", "1234", clientType.CUSTOMER);
-		// //customerFacade.purchaseCoupon(customer5, coupon1);
-		// System.out.println(customerFacade.getCouponsPurchaseHistory());
+		customerFacade.login("Maya", "1234", clientType.CUSTOMER);
+		customerFacade.purchaseCoupon(customer5, coupon1);
+
+		System.out.println(customerFacade.getCouponsPurchaseHistory());
 		//
 		// customerFacade.login("Aurora", "1234", clientType.CUSTOMER);
 		// //customerFacade.purchaseCoupon(customer6, coupon1);
@@ -130,7 +130,8 @@ public class Testing {
 		// customerFacade.purchaseCoupon(customer2, coupon1);
 		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 
-		// CouponSystem.getInstance().stopTask();
+		CouponSystem.getInstance().stopTask();
+		// ConnectionPool.getInstance().closeAllConnections();
 
 		System.out.println("End.");
 	}

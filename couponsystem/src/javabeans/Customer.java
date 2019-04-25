@@ -1,13 +1,14 @@
 package javabeans;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 public class Customer {
 	private static int COUNTER = 1;
 	private long id;
 	private String custName;
 	private String password;
-	private ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+	private Collection<Coupon> coupons = new LinkedHashSet<Coupon>();
 	
 	public Customer() {
 		
@@ -53,11 +54,11 @@ public class Customer {
 		this.password = password;
 	}
 	
-	public ArrayList<Coupon> getCoupons() {
+	public Collection<Coupon> getCoupons() {
 		return this.coupons;	
 	}
 	
-	public void setCoupons(ArrayList<Coupon> coupons) {
+	public void setCoupons(Collection<Coupon> coupons) {
 		this.coupons = coupons;
 	}
 	

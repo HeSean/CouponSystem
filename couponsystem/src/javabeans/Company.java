@@ -1,7 +1,7 @@
 package javabeans;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 public class Company {
 	private static int COUNTER = 1;
@@ -9,7 +9,7 @@ public class Company {
 	private String compName;
 	private String password;
 	private String email;
-	private Collection<Coupon> coupons = new ArrayList<Coupon>();
+	private Collection<Coupon> coupons = new LinkedHashSet<Coupon>();
 
 	//empty ctor
 	public Company() {
@@ -74,7 +74,7 @@ public class Company {
 		return this.coupons;
 	}
 
-	public void setCoupons(ArrayList<Coupon> coupons) {
+	public void setCoupons(Collection<Coupon> coupons) {
 		this.coupons = coupons;
 	}
 

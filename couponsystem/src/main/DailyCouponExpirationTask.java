@@ -35,11 +35,11 @@ public class DailyCouponExpirationTask implements Runnable {
 			}
 			try {
 				System.out.println("Thread going to sleep");
-				// Thread.sleep(100 * 60 * 60 * 24);
-				Thread.sleep(100 * 10 * 10);
+				Thread.sleep(100 * 60 * 60 * 24);
+				// Thread.sleep(100 * 10 * 10);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 				running = false;
+				e.printStackTrace();
 			}
 		}
 	}
