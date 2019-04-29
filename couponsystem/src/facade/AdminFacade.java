@@ -1,10 +1,12 @@
 package facade;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.Collection;
 
 import dao.CompanyDBDAO;
 import dao.CouponDBDAO;
 import dao.CustomerDBDAO;
+import exception.EmptyException;
 import exception.FailedConnectionException;
 import exception.NameExistsException;
 import javabeans.Company;
@@ -15,8 +17,8 @@ public class AdminFacade implements CouponClientFacade {
 
 	private static final String ADMINUSER = "admin";
 	private static final String ADMINPASSWORD = "1234";
-	private CompanyDBDAO companyDBDAO= new CompanyDBDAO();
-	private CustomerDBDAO customerDBDAO  = new CustomerDBDAO();
+	private CompanyDBDAO companyDBDAO = new CompanyDBDAO();
+	private CustomerDBDAO customerDBDAO = new CustomerDBDAO();
 	private CouponDBDAO couponDBDAO = new CouponDBDAO();
 
 	public AdminFacade() {
@@ -88,12 +90,16 @@ public class AdminFacade implements CouponClientFacade {
 		return customerDBDAO.getAllCustomers();
 	}
 
-	public Collection<Coupon> getAllCoupons()   {
+	public Collection<Coupon> getAllCoupons() {
 		try {
 			return couponDBDAO.getAllCoupons();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
-		} return null;
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
+		}
+		return null;
 	}
 
 }

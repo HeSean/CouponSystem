@@ -19,16 +19,18 @@ import javabeans.Company;
 import javabeans.Coupon;
 import javabeans.CouponType;
 import javabeans.Customer;
-import main.ConnectionPool;
+import main.ConnectionPoolBlockingQueue;
 
 public class CouponDBDAO implements CouponDAO {
 
-	private ConnectionPool pool;
+	// private ConnectionPool pool;
 	private CompanyDBDAO companyDBDAO;
+	private ConnectionPoolBlockingQueue pool;
 
 	public CouponDBDAO() {
 		try {
-			pool = ConnectionPool.getInstance();
+			// pool = ConnectionPool.getInstance();
+			pool = ConnectionPoolBlockingQueue.getInstance();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
@@ -385,7 +387,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	@Override
-	public Collection<Coupon> getAllCoupons() throws FailedConnectionException {
+	public Collection<Coupon> getAllCoupons() throws FailedConnectionException, SQLSyntaxErrorException {
 		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		Connection connection = null;
 		try {
@@ -413,8 +415,10 @@ public class CouponDBDAO implements CouponDAO {
 				// - %s | message - %s | price - %.2f | image - %s",
 				// id, title, startDate, endDate, amount, type, message, price, image);
 			}
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			pool.returnConnection(connection);

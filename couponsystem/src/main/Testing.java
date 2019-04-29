@@ -18,7 +18,7 @@ public class Testing {
 		System.out.println("Start.");
 		CouponSystem.getInstance().startCouponsUpdater();
 
-		// Database database = new Database();
+		Database database = new Database();
 		// database.dropCompanyCouponTable();
 		// database.dropCustomerCouponTable();
 		// database.dropCompanysTable();
@@ -31,13 +31,13 @@ public class Testing {
 		// database.createCustomerCouponTable();
 
 		Coupon coupon1 = new Coupon("Seventh Popcorn Free", LocalDate.now(), LocalDate.of(2019, 10, 1), 5,
-				CouponType.FOOD, "By YesPlanet", 15);
+				CouponType.FOOD, "By YesPlanet", 15, "");
 		Coupon coupon2 = new Coupon("Free Popcorn with movie", LocalDate.now(), LocalDate.of(2019, 10, 1), 5,
-				CouponType.FOOD, "By YesPlanet", 15);
+				CouponType.FOOD, "By YesPlanet", 15, "");
 		Coupon coupon3 = new Coupon("Free Tent with Lederman swiss knife", LocalDate.now(), LocalDate.of(2019, 10, 1),
-				5, CouponType.CAMPING, "By Hagor", 15);
+				5, CouponType.CAMPING, "By Hagor", 15, "");
 		Coupon coupon4 = new Coupon("Bonus ChickenWing with takeout order", LocalDate.now(), LocalDate.of(2019, 10, 1),
-				5, CouponType.FOOD, "By Japanika", 15);
+				5, CouponType.FOOD, "By Japanika", 15, "");
 		Customer customer1 = new Customer("Sean", "1234");
 		Customer customer2 = new Customer("Michael", "1234");
 		Customer customer3 = new Customer("Tomer", "1234");
@@ -51,6 +51,7 @@ public class Testing {
 		CompanyFacade companyFacade = new CompanyFacade();
 		CustomerFacade customerFacade = new CustomerFacade();
 
+		CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
 		// adminFacade.createCompany(company1);
 		// adminFacade.createCompany(company2);
 		// adminFacade.createCompany(company3);
@@ -68,58 +69,58 @@ public class Testing {
 		// companyFacade.login("Japanika", "1234", clientType.COMPANY);
 		//
 		// companyFacade.getAllCompanies();
-		// companyFacade.getAllCoupon();
+		// System.out.println(companyFacade.getAllCoupons());
 		// companyFacade.getCouponByPrice(10);
 		// companyFacade.getCouponByType(CouponType.FOOD);
 		// companyFacade.getCoupon(2);
-		// companyFacade.getAllCoupon();
 		// companyFacade.getCouponByDate(LocalDate.now());
 
 		// companyFacade.removeCoupon(coupon1);
 		// customerFacade.purchaseCoupon(customer1, coupon4);
 		// customerFacade.purchaseCoupon(customer1, coupon3);
 
-		// customerFacade.getAllCustomers();
-		// System.out.println(customerFacade.getCustomer(1));
-		// System.out.println(customerFacade.getAllPurchasedHistory(1));
+		CouponSystem.getInstance().login("Sean", "1234", clientType.CUSTOMER);
 
-		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
-		// System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
-		// System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.CAMPING));
+		customerFacade.getAllCustomers();
+		System.out.println(customerFacade.getCustomer(1));
+		System.out.println(customerFacade.getAllPurchasedHistory(1));
+		 customerFacade.login("Michael", "1234", clientType.CUSTOMER);
+
+		System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
+		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
+		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.CAMPING));
 
 		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
 
-		adminFacade.login("admin", "1234", clientType.ADMINISTRATOR);
-		System.out.println(adminFacade.getAllCoupons());
-
-		// adminFacade.getAllCompanies();
-		// adminFacade.getAllCustomers();
-
-		companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
-		// companyFacade.removeCoupon(coupon1);
-
-		System.out.println(companyFacade.getAllCoupons());
-
-		// customerFacade.purchaseCoupon(customer1, coupon1);
-		// customerFacade.purchaseCoupon(customer1, coupon1);
+		// System.out.println(adminFacade.getAllCoupons());
+		//
+		  adminFacade.getAllCompanies();
+		  adminFacade.getAllCustomers();
+		//
+		 //companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
+		// // companyFacade.removeCoupon(coupon1);
+		//
+		// System.out.println(companyFacade.getAllCoupons());
+		//
+		// // customerFacade.purchaseCoupon(customer1, coupon1);
+		// // customerFacade.purchaseCoupon(customer1, coupon1);
+		// // System.out.println(customerFacade.getCouponsPurchaseHistory());
+		// //
+		// // customerFacade.purchaseCoupon(customer2, coupon1);
+		//
+		// // customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
+		// // customerFacade.purchaseCoupon(customer3, coupon1);
+		// //
+		// // customerFacade.login("Kobi", "1234", clientType.CUSTOMER);
+		// // customerFacade.purchaseCoupon(customer4, coupon1);
+		// customerFacade.login("Sean", "1234", clientType.CUSTOMER);
 		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 		//
-		// customerFacade.login("Michael", "1234", clientType.CUSTOMER);
-		// customerFacade.purchaseCoupon(customer2, coupon1);
-
-		// customerFacade.login("Tomer", "1234", clientType.CUSTOMER);
-		// customerFacade.purchaseCoupon(customer3, coupon1);
+		// //
+		// customerFacade.login("Maya", "1234", clientType.CUSTOMER);
+		// // customerFacade.purchaseCoupon(customer5, coupon1);
 		//
-		// customerFacade.login("Kobi", "1234", clientType.CUSTOMER);
-		// customerFacade.purchaseCoupon(customer4, coupon1);
-		customerFacade.login("Sean", "1234", clientType.CUSTOMER);
-		System.out.println(customerFacade.getCouponsPurchaseHistory());
-
-		//
-		customerFacade.login("Maya", "1234", clientType.CUSTOMER);
-		customerFacade.purchaseCoupon(customer5, coupon1);
-
-		System.out.println(customerFacade.getCouponsPurchaseHistory());
+		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 		//
 		// customerFacade.login("Aurora", "1234", clientType.CUSTOMER);
 		// //customerFacade.purchaseCoupon(customer6, coupon1);
@@ -131,9 +132,12 @@ public class Testing {
 		// System.out.println(customerFacade.getCouponsPurchaseHistory());
 
 		CouponSystem.getInstance().stopTask();
+		// ConnectionPoolBlockingQueue.getInstance().shutDownConnections();
+		ConnectionPoolBlockingQueue.getInstance().closeAllConnections();
 		// ConnectionPool.getInstance().closeAllConnections();
 
 		System.out.println("End.");
+
 	}
 
 }

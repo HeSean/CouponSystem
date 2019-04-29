@@ -75,7 +75,7 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 
 	public Collection<Coupon> getCouponByDate(LocalDate localDate) throws Exception {
-		System.out.println("Available coupons by given date - " + localDate + " are:");
+		System.out.println("\nAvailable coupons by given date - " + localDate + " are:");
 		Collection<Coupon> coupons = couponDBDAO.getCouponByDate(localDate);
 		if (!coupons.isEmpty()) {
 			return coupons;

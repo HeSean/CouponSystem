@@ -18,7 +18,6 @@ public class Company {
 
 	//first creation ctor
 	public Company(String compName, String password, String email) {
-		super();
 		setId(COUNTER++);
 		setCompName(compName);
 		setPassword(password);

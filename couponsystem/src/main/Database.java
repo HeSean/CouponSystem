@@ -6,16 +6,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 
-import exception.WrongInfoInsertedException;
+import exception.IncorrectCredentialsException;
 import exception.EmptyException;
 import exception.NameExistsException;
 
 public class Database {
 
 	private static String connectionString = "jdbc:mysql://localhost:3306/CouponSystem?user=user&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT";
+	private static String imageURL = "https://tinyurl.com/y3rauvft";
 
 	public static String getDBURL() {
 		return connectionString;
+	}
+
+	public static String getImageURL() {
+		return imageURL;
 	}
 
 	// Create table method
@@ -230,8 +235,8 @@ public class Database {
 				System.out.println("Alter action succesfull --> " + "ALTER table if exists" + tableName + "CHANGE "
 						+ oldColumn + " " + newColumn + " " + type);
 			} else
-				throw new WrongInfoInsertedException("Customer_Coupon Table");
-		} catch (WrongInfoInsertedException e) {
+				throw new IncorrectCredentialsException("Customer_Coupon Table");
+		} catch (IncorrectCredentialsException e) {
 			e.printStackTrace();
 		}
 	}

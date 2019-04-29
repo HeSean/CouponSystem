@@ -20,6 +20,9 @@ public class CouponSystem {
 	private CouponSystem() throws FailedConnectionException {
 		runnable = new DailyCouponExpirationTask();
 		update = new Thread(runnable);
+		adminFacade = new AdminFacade();
+		customerFacade = new CustomerFacade();
+		companyFacade = new CompanyFacade();
 	}
 
 	public static CouponSystem getInstance() throws FailedConnectionException {

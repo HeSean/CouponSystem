@@ -76,10 +76,10 @@ public class CustomerFacade implements CouponClientFacade {
 	// get customers purchase history By Type
 	public Collection<Coupon> getAllPurchasedCouponsByType(CouponType couponType) throws Exception {
 		System.out.println( "Previously purchased coupons of type " + couponType + " by customer " + customer.getCustName() + " are -");
-		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(customer.getId());
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Long> couponsID =  (LinkedHashSet<Long>) customerDBDAO.getCouponsID(customer.getId());
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		if (!couponsID.isEmpty()) {
-			coupons = (ArrayList<Coupon>) customerDBDAO.getCoupons(couponsID);
+			coupons =  (LinkedHashSet<Coupon>) customerDBDAO.getCoupons(couponsID);
 		}
 		Iterator<Coupon> iterator = coupons.iterator();
 		while (iterator.hasNext()) {
@@ -95,10 +95,10 @@ public class CustomerFacade implements CouponClientFacade {
 	// get customers purchase history By Price
 	public Collection<Coupon> getAllPurchasedCouponsByPrice(double price) throws Exception {
 		System.out.println("Customer " + customer.getCustName() + " previously purchased coupons under " + price + "$ are -");
-		ArrayList<Long> couponsID = (ArrayList<Long>) customerDBDAO.getCouponsID(customer.getId());
-		ArrayList<Coupon> coupons = new ArrayList<Coupon>();
+		LinkedHashSet<Long> couponsID = (LinkedHashSet<Long>) customerDBDAO.getCouponsID(customer.getId());
+		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		if (!couponsID.isEmpty()) {
-			coupons = (ArrayList<Coupon>) customerDBDAO.getCoupons(couponsID);
+			coupons = (LinkedHashSet<Coupon>) customerDBDAO.getCoupons(couponsID);
 		}
 		Iterator<Coupon> iterator = coupons.iterator();
 		while (iterator.hasNext()) {

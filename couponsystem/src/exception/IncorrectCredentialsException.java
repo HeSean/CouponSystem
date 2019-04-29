@@ -1,14 +1,14 @@
 package exception;
 
-public class WrongInfoInsertedException extends Exception {
+public class IncorrectCredentialsException extends Exception {
 	private static final long serialVersionUID = 1L;
 	private String msg;
 
-	public WrongInfoInsertedException() {
+	public IncorrectCredentialsException() {
 		super();
 	}
 
-	public WrongInfoInsertedException(String msg) {
+	public IncorrectCredentialsException(String msg) {
 		super();
 		setMsg(msg);
 	}
@@ -24,9 +24,9 @@ public class WrongInfoInsertedException extends Exception {
 	@Override
 	public String toString() {
 		if (msg != null) {
-			return "WrongInfoInsertedException - " + msg;
+			return "IncorrectCredentialsException - " + msg;
 		} else 
-		return "WrongInfoInsertedException - No objects were found.";
+		return "IncorrectCredentialsException - No objects were found.";
 	}
 
 

@@ -11,18 +11,20 @@ import java.util.LinkedHashSet;
 
 import exception.EmptyException;
 import exception.FailedConnectionException;
-import exception.WrongInfoInsertedException;
+import exception.IncorrectCredentialsException;
 import javabeans.Coupon;
 import javabeans.Customer;
-import main.ConnectionPool;
+import main.ConnectionPoolBlockingQueue;
 
 public class CustomerDBDAO implements CustomerDAO {
 
-	private ConnectionPool pool;
+	//private ConnectionPool pool;
+	private ConnectionPoolBlockingQueue pool;
 
 	public CustomerDBDAO() {
 		try {
-			pool = ConnectionPool.getInstance();
+			pool = ConnectionPoolBlockingQueue.getInstance();
+			//pool = ConnectionPool.getInstance();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
@@ -344,14 +346,14 @@ public class CustomerDBDAO implements CustomerDAO {
 				// id = resultSet.getLong("id");
 			}
 			if (name == null) {
-				throw new WrongInfoInsertedException("Customer with that name doesnt exist.");
+				throw new IncorrectCredentialsException("Customer with that name doesnt exist.");
 			}
 			if (givenPassword.equals(password)) {
 				correctInitials = true;
 			} else {
-				throw new WrongInfoInsertedException("Customer with that password doesnt exist.");
+				throw new IncorrectCredentialsException("Customer with that password doesnt exist.");
 			}
-		} catch (WrongInfoInsertedException e) {
+		} catch (IncorrectCredentialsException e) {
 			e.printStackTrace();
 		} catch (SQLSyntaxErrorException e) {
 			EmptyException ee = new EmptyException("Customers table does not exist .");

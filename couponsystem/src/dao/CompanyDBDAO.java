@@ -12,22 +12,26 @@ import java.util.LinkedHashSet;
 
 import exception.EmptyException;
 import exception.FailedConnectionException;
-import exception.WrongInfoInsertedException;
+import exception.IncorrectCredentialsException;
 import javabeans.Company;
 import javabeans.Coupon;
 import main.ConnectionPool;
+import main.ConnectionPoolBlockingQueue;
 
 @SuppressWarnings("unused")
 public class CompanyDBDAO implements CompanyDAO {
 
 	private long companyID;
-	private ConnectionPool pool;
+	//private ConnectionPool pool;
 	private CouponDBDAO couponDBDAO;
+	private ConnectionPoolBlockingQueue pool;
+
 
 	public CompanyDBDAO() {
 		couponDBDAO = new CouponDBDAO();
 		try {
-			pool = ConnectionPool.getInstance();
+			//pool = ConnectionPool.getInstance();
+			pool = ConnectionPoolBlockingQueue.getInstance();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
@@ -303,6 +307,9 @@ public class CompanyDBDAO implements CompanyDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}catch (NullPointerException e) {
+			EmptyException ee = new EmptyException("Tried to run pointer on null object.");
+			ee.printStackTrace();
 		}finally {
 			pool.returnConnection(connection);
 		}
@@ -331,15 +338,15 @@ public class CompanyDBDAO implements CompanyDAO {
 				id = resultSet.getLong("id");
 			}
 			if (name == null) {
-				throw new WrongInfoInsertedException("Company with that name doesnt exist.");
+				throw new IncorrectCredentialsException("Company with that name doesnt exist.");
 			}
 			if (givenPassword.equals(password)) {
 				correctInitials = true;
 				companyID = id;
 			} else {
-				throw new WrongInfoInsertedException("Company with that password doesnt exist.");
+				throw new IncorrectCredentialsException("Company with that password doesnt exist.");
 			}
-		} catch (WrongInfoInsertedException e) {
+		} catch (IncorrectCredentialsException e) {
 			e.printStackTrace();
 		} catch (SQLSyntaxErrorException e) {
 			EmptyException ee = new EmptyException("Companys table does not exist .");

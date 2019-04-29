@@ -2,6 +2,8 @@ package javabeans;
 
 import java.time.LocalDate;
 
+import main.Database;
+
 public class Coupon {
 	private static int COUNTER = 1;
 	private long id;
@@ -19,9 +21,7 @@ public class Coupon {
 	}
 
 	public Coupon(String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
-			double price) {
-		// String image) {
-		super();
+			double price, String image) {
 		setId(COUNTER++);
 		setTitle(title);
 		setStartDate(startDate);
@@ -30,13 +30,11 @@ public class Coupon {
 		setType(type);
 		setMessage(message);
 		setPrice(price);
-		setImage("null");
+		setImage(Database.getImageURL());
 	}
 
 	public Coupon(Long id, String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
-			double price) {
-		// String image) {
-		super();
+			double price, String image) {
 		setId(id);
 		setTitle(title);
 		setStartDate(startDate);
@@ -45,12 +43,11 @@ public class Coupon {
 		setType(type);
 		setMessage(message);
 		setPrice(price);
-		setImage("null");
+		setImage(Database.getImageURL());
 	}
 
 	public Coupon(Long id, String title, LocalDate sDate, LocalDate eDate, int amount, String type, String message,
-			Double price) {
-		super();
+			double price) {
 		setId(id);
 		setTitle(title);
 		setStartDate(sDate);
@@ -59,7 +56,7 @@ public class Coupon {
 		setType(type);
 		setMessage(message);
 		setPrice(price);
-		//setImage(image2);
+		setImage(Database.getImageURL());
 	}
 
 	private void setType(CouponType type) {
