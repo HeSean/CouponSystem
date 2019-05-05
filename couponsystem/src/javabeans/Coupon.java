@@ -20,6 +20,7 @@ public class Coupon {
 
 	}
 
+	// regular ctor
 	public Coupon(String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
 			double price, String image) {
 		setId(COUNTER++);
@@ -33,6 +34,7 @@ public class Coupon {
 		setImage(Database.getImageURL());
 	}
 
+	// new coupon with specified ID
 	public Coupon(Long id, String title, LocalDate startDate, LocalDate endDate, int amount, CouponType type, String message,
 			double price, String image) {
 		setId(id);
@@ -46,8 +48,9 @@ public class Coupon {
 		setImage(Database.getImageURL());
 	}
 
+	// Retrieving coupon from db
 	public Coupon(Long id, String title, LocalDate sDate, LocalDate eDate, int amount, String type, String message,
-			double price) {
+			double price, String image) {
 		setId(id);
 		setTitle(title);
 		setStartDate(sDate);

@@ -11,13 +11,13 @@ public class NameExistsException extends RuntimeException {
 	private Object object;
 
 	public NameExistsException(String name, Object object) {
-		super();
+		super(name);
 		setName(name);
 		this.object = object;
 	}
 
 	public NameExistsException(String name) {
-		super();
+		super(name);
 		setName(name);
 	}
 
@@ -32,16 +32,16 @@ public class NameExistsException extends RuntimeException {
 	@Override
 	public String toString() {
 		if (object instanceof Company) {
-			return " \nNameExistsException of Comapny Name - \"" + name
+			return "NameExistsException of Comapny Name - \"" + name
 					+ "\". There is already a company with that name, Please try again with a different name.";
 		} else if (object instanceof Customer) {
-			return " \nNameExistsException of Customer Name - \"" + name
+			return "NameExistsException of Customer Name - \"" + name
 					+ "\". There is already a customer with that name, Please try again with a different name.";
 		} else if (object instanceof Coupon) {
-			return " \nNameExistsException of Coupon Title - \"" + name
+			return "NameExistsException of Coupon Title - \"" + name
 					+ "\". There is already a coupon with that name, Please try again with a different name.";
 		} else
-			return " \nNameExistsException of " + name + ". " + name
+			return "NameExistsException of " + name + ". " + name
 					+ " already exists.";
 
 	}

@@ -1,6 +1,5 @@
 package facade;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -64,7 +63,7 @@ public class CustomerFacade implements CouponClientFacade {
 	
 	
 	// get customers entire purchase history
-	public Collection<Coupon> getAllPurchasedHistory(long id) throws Exception {
+	public Collection<Coupon> getPurchasedHistoryWithID(long id) throws Exception {
 		LinkedHashSet<Long> couponsID = (LinkedHashSet<Long>) customerDBDAO.getCouponsID(id);
 		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		if (!couponsID.isEmpty()) {
@@ -94,7 +93,7 @@ public class CustomerFacade implements CouponClientFacade {
 	
 	// get customers purchase history By Price
 	public Collection<Coupon> getAllPurchasedCouponsByPrice(double price) throws Exception {
-		System.out.println("Customer " + customer.getCustName() + " previously purchased coupons under " + price + "$ are -");
+		System.out.println("Previously purchased coupons under " + price + "$ by customer "+ customer.getCustName() + " are -");
 		LinkedHashSet<Long> couponsID = (LinkedHashSet<Long>) customerDBDAO.getCouponsID(customer.getId());
 		LinkedHashSet<Coupon> coupons = new LinkedHashSet<Coupon>();
 		if (!couponsID.isEmpty()) {

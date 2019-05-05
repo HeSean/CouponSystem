@@ -6,6 +6,8 @@ import java.util.LinkedHashSet;
 
 import dao.CompanyDBDAO;
 import dao.CouponDBDAO;
+import exception.EmptyException;
+import exception.FailedConnectionException;
 import exception.NameExistsException;
 import javabeans.Company;
 import javabeans.Coupon;
@@ -36,8 +38,14 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 
 	// Method for removing coupon
-	public void removeCoupon(Coupon coupon) throws Exception {
-		couponDBDAO.removeCoupon(coupon);
+	public void removeCoupon(Coupon coupon) {
+		try {
+			couponDBDAO.removeCoupon(coupon);
+		} catch (EmptyException e) {
+			e.printStackTrace();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// Method for updating coupon details - end date or price
@@ -56,9 +64,16 @@ public class CompanyFacade implements CouponClientFacade {
 
 	public Collection<Coupon> getCouponByType(CouponType cType) throws Exception {
 		System.out.println("Coupons from type " + cType + " are:");
-		Collection<Coupon> coupons = couponDBDAO.getCouponByType(cType);
-		if (!coupons.isEmpty()) {
-			return coupons;
+		LinkedHashSet<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
+		LinkedHashSet<Coupon> coupons = (LinkedHashSet<Coupon>) companyDBDAO.getCoupons(couponsID);
+		LinkedHashSet<Coupon> wantedCoupons = new LinkedHashSet<>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getType().equals(cType)) {
+				wantedCoupons.add(coupon);
+			}
+		}
+		if (!wantedCoupons.isEmpty()) {
+			return wantedCoupons;
 		} else
 			System.out.println("No coupons were found from type - " + cType);
 		return null;
@@ -66,17 +81,31 @@ public class CompanyFacade implements CouponClientFacade {
 
 	public Collection<Coupon> getCouponByPrice(double price) throws Exception {
 		System.out.println("Coupons under " + price + "$ price are:");
-		Collection<Coupon> coupons = couponDBDAO.getCouponByPrice(price);
-		if (!coupons.isEmpty()) {
-			return coupons;
+		LinkedHashSet<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
+		LinkedHashSet<Coupon> coupons = (LinkedHashSet<Coupon>) companyDBDAO.getCoupons(couponsID);
+		LinkedHashSet<Coupon> wantedCoupons = new LinkedHashSet<>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getPrice() < price) {
+				wantedCoupons.add(coupon);
+			}
+		}
+		if (!wantedCoupons.isEmpty()) {
+			return wantedCoupons;
 		} else
 			System.out.println("No coupons were found under that price - " + price);
 		return null;
 	}
 
 	public Collection<Coupon> getCouponByDate(LocalDate localDate) throws Exception {
-		System.out.println("\nAvailable coupons by given date - " + localDate + " are:");
-		Collection<Coupon> coupons = couponDBDAO.getCouponByDate(localDate);
+		System.out.println("Available coupons by given date - " + localDate + " are:");
+		LinkedHashSet<Long> couponsID = companyDBDAO.getCouponsID(company.getId());
+		LinkedHashSet<Coupon> coupons = (LinkedHashSet<Coupon>) companyDBDAO.getCoupons(couponsID);
+		LinkedHashSet<Coupon> wantedCoupons = new LinkedHashSet<>();
+		for (Coupon coupon : coupons) {
+			if (coupon.getEndDate().compareTo(localDate) > 0) {
+				wantedCoupons.add(coupon);
+			}
+		}
 		if (!coupons.isEmpty()) {
 			return coupons;
 		} else

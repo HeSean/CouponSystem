@@ -18,13 +18,13 @@ import main.ConnectionPoolBlockingQueue;
 
 public class CustomerDBDAO implements CustomerDAO {
 
-	//private ConnectionPool pool;
+	// private ConnectionPool pool;
 	private ConnectionPoolBlockingQueue pool;
 
 	public CustomerDBDAO() {
 		try {
 			pool = ConnectionPoolBlockingQueue.getInstance();
-			//pool = ConnectionPool.getInstance();
+			// pool = ConnectionPool.getInstance();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
@@ -57,7 +57,32 @@ public class CustomerDBDAO implements CustomerDAO {
 			pool.returnConnection(connection);
 		}
 	}
-
+	public boolean doesCustomerExist(long id) throws FailedConnectionException {
+		boolean doesCustomerExists = false;
+		Connection connection = null;
+		try {
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
+		String sql = String.format("SELECT cust_name FROM customers WHERE id=?");
+		String custName = null;
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, id);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				custName = resultSet.getString("comp_name");
+			}
+			if (custName != null) {
+				doesCustomerExists = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
+		}
+		return doesCustomerExists;
+	}
 	public boolean checkCustomerName(Customer customer) throws FailedConnectionException { // checking if a customer
 																							// already exists with name
 		boolean exists = false;
@@ -91,20 +116,43 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public void removeCustomer(Customer customer) throws FailedConnectionException {
+		try {
+			if (!doesCustomerExist(customer.getId())) {
+				throw new EmptyException("Customer ID " + customer.getId() + " does not exist in database.");
+			}
+		} catch (EmptyException e) {
+			e.printStackTrace();
+			return;
+		}
+		
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
-		String sql = String.format("delete from customers where id = ?");
-		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		String customerSQL = String.format("delete from customers where id = ?");
+		String couponsCustomerSQL = String.format("delete from customers_coupon where customer_ID=?");
+
+		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(couponsCustomerSQL);
+
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, customer.getId());
 			preparedStatement.executeUpdate();
-			System.out
-					.println("Delete succesful of customer - " + customer.getCustName() + ", id - " + customer.getId());
+			System.out.println("Customer removal succesful from Customer - Coupon Table");
+			
+			preparedStatement = connection.prepareStatement(customerSQL);
+			connection.setAutoCommit(false);
+			preparedStatement.setLong(1, customer.getId());
+			preparedStatement.executeUpdate();
+			System.out.println("Customer removal succesful from Customer Table");
+			
 			connection.commit();
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers tables do not exist .");
+			ee.printStackTrace();
+			//e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -126,8 +174,11 @@ public class CustomerDBDAO implements CustomerDAO {
 			preparedStatement.setString(1, customer.getPassword());
 			preparedStatement.setLong(2, customer.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("\nUpdate succesful.\nNew Data - " + customer);
+			System.out.println("Update succesful. New Data - " + customer);
 			connection.commit();
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -155,7 +206,11 @@ public class CustomerDBDAO implements CustomerDAO {
 				wantedCustomer.setCustName(custName);
 				wantedCustomer.setPassword(password);
 				wantedCustomer.setCoupons((LinkedHashSet<Coupon>) getCoupons((LinkedHashSet<Long>) getCouponsID(id)));
+				//System.out.printf("id- %d | name- %s | password - %s\n", id, custName, password);
 			}
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -212,10 +267,14 @@ public class CustomerDBDAO implements CustomerDAO {
 			while (resultSet.next()) {
 				long id = resultSet.getLong("id");
 				String custName = resultSet.getString("cust_Name");
-				customers.add(new Customer(id, custName));
-				System.out.printf("id- %d | name- %s\n", id, custName);
+				String password = resultSet.getString("password");
+				customers.add(new Customer(id, custName, password));
+				//System.out.printf("id- %d | name- %s | password - %s\n", id, custName, resultSet.getString("password"));
 			}
 
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Customers table does not exist .");
+			ee.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -272,13 +331,13 @@ public class CustomerDBDAO implements CustomerDAO {
 					String type = resultSet.getString(6);
 					String message = resultSet.getString("message");
 					Double price = resultSet.getDouble("price");
-					// String image = resultSet.getString("image");
-					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+					String image = resultSet.getString("image");
+					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return coupons;
@@ -312,13 +371,13 @@ public class CustomerDBDAO implements CustomerDAO {
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
-				// String image = resultSet.getString("image");
+				String image = resultSet.getString("image");
 
-				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return coupons;
@@ -360,7 +419,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return correctInitials;

@@ -60,7 +60,7 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.executeUpdate();
 			ResultSet resultSet = preparedStatement.getGeneratedKeys();
 			resultSet.next();
-			System.out.println("\nNew coupon submit into Coupons table succeeded.\n" + coupon);
+			System.out.println("New coupon submit into Coupons table succeeded. \n" + coupon);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -91,7 +91,6 @@ public class CouponDBDAO implements CouponDAO {
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			pool.returnConnection(connection);
@@ -184,7 +183,7 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.setLong(1, compID);
 			preparedStatement.setLong(2, couponID);
 			preparedStatement.executeUpdate();
-			System.out.println("\nNew coupon submit into Company - Coupon table succeeded.");
+			System.out.println("New coupon submit into Company - Coupon table succeeded.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -217,7 +216,7 @@ public class CouponDBDAO implements CouponDAO {
 	@Override
 	public void removeCoupon(Coupon coupon) throws FailedConnectionException {
 		if (!doesCouponExist(coupon.getId())) {
-			throw new EmptyException("Coupon ID does not exist in database.");
+			throw new EmptyException("Coupon ID " + coupon.getId()+ " does not exist in database." );
 		}
 		Connection connection = null;
 		try {
@@ -231,8 +230,10 @@ public class CouponDBDAO implements CouponDAO {
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, coupon.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from Coupons Table");
+			System.out.println("Delete succesful from Coupons Table of coupon id = " + coupon.getId());
 			connection.commit();
+		} catch (EmptyException e) {
+			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -274,8 +275,12 @@ public class CouponDBDAO implements CouponDAO {
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
 			preparedStatement.setLong(1, id);
-			preparedStatement.executeUpdate();
-			System.out.println("Delete succesful from Coupons Table of coupon - " + id);
+			if (preparedStatement.execute()) {
+				System.out.println("Delete succesful from Coupons Table of coupon - " + id);
+			} else
+				throw new EmptyException("No coupon found with id - " + id);
+		} catch (EmptyException e) {
+			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -324,8 +329,8 @@ public class CouponDBDAO implements CouponDAO {
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(9, coupon.getId());
 			preparedStatement.setString(1, coupon.getTitle());
-			preparedStatement.setDate(3, Date.valueOf(coupon.getStartDate()));
-			preparedStatement.setDate(4, Date.valueOf(coupon.getEndDate()));
+			preparedStatement.setDate(2, Date.valueOf(coupon.getStartDate()));
+			preparedStatement.setDate(3, Date.valueOf(coupon.getEndDate()));
 			preparedStatement.setInt(4, coupon.getAmount());
 			preparedStatement.setString(5, coupon.getType().name());
 			preparedStatement.setString(6, coupon.getMessage());
@@ -333,7 +338,7 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement.setString(8, coupon.getImage());
 
 			preparedStatement.executeUpdate();
-			System.out.println("\nUpdate succesful.\nNew Data - " + coupon);
+			System.out.println("Update succesful.\nNew Data - " + coupon);
 			connection.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -366,9 +371,10 @@ public class CouponDBDAO implements CouponDAO {
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-				System.out.printf(
-						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f | image - %s ",
-						id, title, startDate, endDate, amount, type, message, price, image);
+//				System.out.printf(
+//						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f | image - %s\n",
+//						id, title, startDate, endDate, amount, type, message, price, image);
+				wantedCoupon.setId(id);
 				wantedCoupon.setTitle(title);
 				wantedCoupon.setStartDate(startDate);
 				wantedCoupon.setEndDate(endDate);
@@ -407,16 +413,16 @@ public class CouponDBDAO implements CouponDAO {
 				String type = resultSet.getString(6);
 				String message = resultSet.getString("message");
 				Double price = resultSet.getDouble("price");
-				// String image = resultSet.getString("image");
+				String image = resultSet.getString("image");
 
-				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				// System.out.printf(
 				// "\nid- %d | title - %s | start date - %s | end date - %s | amount - %d | type
 				// - %s | message - %s | price - %.2f | image - %s",
 				// id, title, startDate, endDate, amount, type, message, price, image);
 			}
 		} catch (SQLSyntaxErrorException e) {
-			EmptyException ee = new EmptyException("Companys table does not exist .");
+			EmptyException ee = new EmptyException("Coupons table does not exist .");
 			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -451,7 +457,7 @@ public class CouponDBDAO implements CouponDAO {
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
 						id, title, startDate, endDate, amount, type, message, price, image);
@@ -489,7 +495,7 @@ public class CouponDBDAO implements CouponDAO {
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
 						id, title, startDate, endDate, amount, type, message, price, image);
@@ -528,7 +534,7 @@ public class CouponDBDAO implements CouponDAO {
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+				coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				System.out.printf(
 						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f  | image - %s\n",
 						id, title, startDate, endDate, amount, type, message, price, image);

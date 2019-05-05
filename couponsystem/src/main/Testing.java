@@ -19,11 +19,11 @@ public class Testing {
 		CouponSystem.getInstance().startCouponsUpdater();
 
 		Database database = new Database();
-		// database.dropCompanyCouponTable();
-		// database.dropCustomerCouponTable();
-		// database.dropCompanysTable();
-		// database.dropCustomersTable();
-		// database.dropCouponsTable();
+//		 database.dropCompanyCouponTable();
+//		 database.dropCustomerCouponTable();
+//		 database.dropCompanysTable();
+//		 database.dropCustomersTable();
+//		 database.dropCouponsTable();
 		// database.createCompanysTable();
 		// database.createCouponsTable();
 		// database.createCustomersTable();
@@ -79,16 +79,16 @@ public class Testing {
 		// customerFacade.purchaseCoupon(customer1, coupon4);
 		// customerFacade.purchaseCoupon(customer1, coupon3);
 
-		CouponSystem.getInstance().login("Sean", "1234", clientType.CUSTOMER);
+		//CouponSystem.getInstance().login("Sean", "1234", clientType.CUSTOMER);
 
-		customerFacade.getAllCustomers();
-		System.out.println(customerFacade.getCustomer(1));
-		System.out.println(customerFacade.getAllPurchasedHistory(1));
-		 customerFacade.login("Michael", "1234", clientType.CUSTOMER);
-
-		System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
-		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
-		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.CAMPING));
+//		customerFacade.getAllCustomers();
+//		System.out.println(customerFacade.getCustomer(1));
+//		System.out.println(customerFacade.getAllPurchasedHistory(1));
+//		 customerFacade.login("Michael", "1234", clientType.CUSTOMER);
+//
+//		System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
+//		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.FOOD));
+//		System.out.println(customerFacade.getAllPurchasedCouponsByType(CouponType.CAMPING));
 
 		// System.out.println(customerFacade.getAllPurchasedCouponsByPrice(100));
 
@@ -96,6 +96,7 @@ public class Testing {
 		//
 		  adminFacade.getAllCompanies();
 		  adminFacade.getAllCustomers();
+		  System.out.println(adminFacade.getAllCoupons());
 		//
 		 //companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
 		// // companyFacade.removeCoupon(coupon1);

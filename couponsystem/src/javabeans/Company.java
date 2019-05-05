@@ -84,7 +84,7 @@ public class Company {
 	@Override
 	public String toString() {
 		return "Company [ ID = " + id + " | Company Name = " + compName + " | Password = " + password
-				+ "| Email Address = " + email + " | Available Coupons = " + coupons + "]";
+				+ " | Email Address = " + email + " | Available Coupons = " + coupons + "]";
 	}
 
 }

@@ -15,6 +15,7 @@ import exception.FailedConnectionException;
 import exception.IncorrectCredentialsException;
 import javabeans.Company;
 import javabeans.Coupon;
+import javabeans.CouponType;
 import main.ConnectionPool;
 import main.ConnectionPoolBlockingQueue;
 
@@ -22,15 +23,14 @@ import main.ConnectionPoolBlockingQueue;
 public class CompanyDBDAO implements CompanyDAO {
 
 	private long companyID;
-	//private ConnectionPool pool;
+	// private ConnectionPool pool;
 	private CouponDBDAO couponDBDAO;
 	private ConnectionPoolBlockingQueue pool;
-
 
 	public CompanyDBDAO() {
 		couponDBDAO = new CouponDBDAO();
 		try {
-			//pool = ConnectionPool.getInstance();
+			// pool = ConnectionPool.getInstance();
 			pool = ConnectionPoolBlockingQueue.getInstance();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
@@ -89,7 +89,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return exists;
@@ -97,31 +97,51 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public void removeCompany(Company company) throws FailedConnectionException {
+		try {
+			if (!doesCompanyExist(company.getId())) {
+				throw new EmptyException("Company ID " + company.getId() + " does not exist in database.");
+			}
+		} catch (EmptyException e) {
+			e.printStackTrace();
+			return;
+		}
+		
 		Connection connection = null;
 		try {
 			connection = pool.getConnection();
 		} catch (FailedConnectionException e) {
 			e.printStackTrace();
 		}
-		String couponSQL = String.format("delete from companys where id=?");
-		String couponsCompanySQL = String.format("delete * company_coupon where comp_ID=?");
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(couponSQL);
+		String companySQL = String.format("delete from companys where id=?");
+		String couponsCompanySQL = String.format("delete from companys_coupon where company_ID=?");
+		String couponsSQL = String.format("DELETE FROM coupons where message like ? ");
 
+		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(couponsCompanySQL);
+
+			connection.setAutoCommit(false);
+			preparedStatement.setLong(1, company.getId());
+			preparedStatement.executeUpdate();
+			System.out.println("Company removal succesful from Company - Coupon Table");
+
+			preparedStatement = connection.prepareStatement(couponsSQL);
+			connection.setAutoCommit(false);
+			preparedStatement.setString(1, "%" + company.getCompName() + "%");
+			preparedStatement.executeUpdate();
+			System.out.println("Companys coupons removal succesful from Coupons Table");
+
+			preparedStatement = connection.prepareStatement(companySQL);
 			connection.setAutoCommit(false);
 			preparedStatement.setLong(1, company.getId());
 			preparedStatement.executeUpdate();
 			System.out.println("Comapny removal from Company table succesful");
-
-			preparedStatement = connection.prepareStatement(couponsCompanySQL);
-			connection.setAutoCommit(false);
-			preparedStatement.setLong(1, company.getId());
-			preparedStatement.executeUpdate();
-			System.out.println("Coupons removal succesful from Company - Coupon Table");
 			connection.commit();
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys tables do not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 
@@ -142,17 +162,54 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedStatement.setString(2, company.getPassword());
 			preparedStatement.setLong(3, company.getId());
 			preparedStatement.executeUpdate();
-			System.out.println("\nUpdate succesful. New Data - " + company);
+			System.out.println("Update succesful. New Data - " + company);
 			connection.commit();
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 	}
 
+	public boolean doesCompanyExist(long id) throws FailedConnectionException {
+		boolean doesCompanyExist = false;
+		Connection connection = null;
+		try {
+			connection = pool.getConnection();
+		} catch (FailedConnectionException e) {
+			e.printStackTrace();
+		}
+		String sql = String.format("SELECT comp_name FROM companys WHERE id=?");
+		String compName = null;
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setLong(1, id);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				compName = resultSet.getString("comp_name");
+			}
+			if (compName != null) {
+				doesCompanyExist = true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			pool.returnConnection(connection);
+		}
+		return doesCompanyExist;
+	}
+
 	@Override
 	public Company getCompany(long id) throws FailedConnectionException {
+		try {
+			if (!doesCompanyExist(id)) {
+				throw new EmptyException("Company ID " + id + " does not exist in database.");
+			}
+		} catch (EmptyException e) {
+			e.printStackTrace();
+		}
 		Company company = new Company();
 		Connection connection = null;
 		try {
@@ -169,10 +226,18 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setCompName(resultSet.getString("comp_Name"));
 				company.setPassword(resultSet.getString("password"));
 				company.setEmail(resultSet.getString("email"));
+				// System.out.printf("id- %d | name- %s | email - %s", id,
+				// resultSet.getString("comp_Name"),
+				// resultSet.getString("email"));
 			}
+		} catch (EmptyException e) {
+			e.printStackTrace();
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return company;
@@ -190,19 +255,19 @@ public class CompanyDBDAO implements CompanyDAO {
 		String sql = "select * from companys";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			ResultSet resultSet = preparedStatement.executeQuery(sql);
-
 			while (resultSet.next()) {
-
-				// int id = resultSet.getInt(1);
 				long id = resultSet.getLong("id");
 				String compName = resultSet.getString("comp_Name");
 				String email = resultSet.getString("email");
 				companys.add(new Company(id, compName, email));
-				System.out.printf("id- %d | name- %s | email - %s\n", id, compName, email);
+				// System.out.printf("id- %d | name- %s | email - %s\n", id, compName, email);
 			}
+		} catch (SQLSyntaxErrorException e) {
+			EmptyException ee = new EmptyException("Companys table does not exist .");
+			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return companys;
@@ -210,11 +275,6 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Collection<Coupon> getCoupons() throws Exception {
-		LinkedHashSet<Long> couponsID = getCouponsID(companyID);
-		return getCoupons(couponsID);
-	}
-
-	public Collection<Coupon> getCompanyCoupons() throws Exception {
 		LinkedHashSet<Long> couponsID = getCouponsID(companyID);
 		return getCoupons(couponsID);
 	}
@@ -245,7 +305,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return wantedCompany;
@@ -269,7 +329,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return couponsID;
@@ -300,17 +360,17 @@ public class CompanyDBDAO implements CompanyDAO {
 					String type = resultSet.getString(6);
 					String message = resultSet.getString("message");
 					Double price = resultSet.getDouble("price");
-					// String image = resultSet.getString("image");
+					String image = resultSet.getString("image");
 
-					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price));
+					coupons.add(new Coupon(id, title, startDate, endDate, amount, type, message, price, image));
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			EmptyException ee = new EmptyException("Tried to run pointer on null object.");
 			ee.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return coupons;
@@ -353,7 +413,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			ee.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			pool.returnConnection(connection);
 		}
 		return correctInitials;

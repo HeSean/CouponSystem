@@ -8,6 +8,7 @@ import dao.CouponDBDAO;
 import dao.CustomerDBDAO;
 import exception.EmptyException;
 import exception.FailedConnectionException;
+import exception.IncorrectCredentialsException;
 import exception.NameExistsException;
 import javabeans.Company;
 import javabeans.Coupon;
@@ -31,7 +32,12 @@ public class AdminFacade implements CouponClientFacade {
 			System.out.println("Welcome admin.");
 			return this;
 		} else
-			return null;
+			try {
+				throw new IncorrectCredentialsException("Incorrect admin credentials.");
+			} catch (IncorrectCredentialsException e) {
+				e.printStackTrace();
+			}
+		return null;
 	}
 
 	// Company Methods
@@ -58,8 +64,8 @@ public class AdminFacade implements CouponClientFacade {
 		return companyDBDAO.getCompany(id);
 	}
 
-	public void getAllCompanies() throws FailedConnectionException {
-		companyDBDAO.getAllCompanys();
+	public Collection<Company> getAllCompanies() throws FailedConnectionException {
+		return companyDBDAO.getAllCompanys();
 	}
 
 	// Customer Methods
