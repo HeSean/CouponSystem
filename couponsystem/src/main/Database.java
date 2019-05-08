@@ -9,14 +9,16 @@ import java.sql.SQLSyntaxErrorException;
 import exception.IncorrectCredentialsException;
 import exception.EmptyException;
 import exception.NameExistsException;
-
+@SuppressWarnings("unused")
 public class Database {
 
-	private static String connectionString = "jdbc:mysql://localhost:3306/CouponSystem?user=user&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT";
+	private static String connectionString = "jdbc:mysql://localhost:3306/CouponSystem?user=user&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT&autoReconnect=true";
+	private static String newConnectionString = "jdbc:mysql://192.168.86.187/CouponSystem?user=user&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT";
 	private static String imageURL = "https://tinyurl.com/y3rauvft";
 
 	public static String getDBURL() {
 		return connectionString;
+		//return newConnectionString;
 	}
 
 	public static String getImageURL() {

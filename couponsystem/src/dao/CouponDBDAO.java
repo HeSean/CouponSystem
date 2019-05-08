@@ -216,7 +216,7 @@ public class CouponDBDAO implements CouponDAO {
 	@Override
 	public void removeCoupon(Coupon coupon) throws FailedConnectionException {
 		if (!doesCouponExist(coupon.getId())) {
-			throw new EmptyException("Coupon ID " + coupon.getId()+ " does not exist in database." );
+			throw new EmptyException("Coupon ID " + coupon.getId() + " does not exist in database.");
 		}
 		Connection connection = null;
 		try {
@@ -253,7 +253,7 @@ public class CouponDBDAO implements CouponDAO {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-				System.out.println("Found an expired coupon..");
+				System.out.println("*** Found an expired coupon ***");
 				removeCouponByID(resultSet.getLong("id"));
 			}
 		} catch (SQLException e) {
@@ -275,7 +275,7 @@ public class CouponDBDAO implements CouponDAO {
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(couponsSQL);
 			preparedStatement.setLong(1, id);
-			if (preparedStatement.execute()) {
+			if (preparedStatement.execute() != true) {
 				System.out.println("Delete succesful from Coupons Table of coupon - " + id);
 			} else
 				throw new EmptyException("No coupon found with id - " + id);
@@ -371,9 +371,10 @@ public class CouponDBDAO implements CouponDAO {
 				Double price = resultSet.getDouble("price");
 				String image = resultSet.getString("image");
 
-//				System.out.printf(
-//						"id- %d | title - %s | start date - %s | end date - %s | amount - %d | type - %s | message - %s | price - %.2f | image - %s\n",
-//						id, title, startDate, endDate, amount, type, message, price, image);
+				// System.out.printf(
+				// "id- %d | title - %s | start date - %s | end date - %s | amount - %d | type -
+				// %s | message - %s | price - %.2f | image - %s\n",
+				// id, title, startDate, endDate, amount, type, message, price, image);
 				wantedCoupon.setId(id);
 				wantedCoupon.setTitle(title);
 				wantedCoupon.setStartDate(startDate);

@@ -38,20 +38,20 @@ public class Testing {
 				5, CouponType.CAMPING, "By Hagor", 15, "");
 		Coupon coupon4 = new Coupon("Bonus ChickenWing with takeout order", LocalDate.now(), LocalDate.of(2019, 10, 1),
 				5, CouponType.FOOD, "By Japanika", 15, "");
-		Customer customer1 = new Customer("Sean", "1234");
-		Customer customer2 = new Customer("Michael", "1234");
-		Customer customer3 = new Customer("Tomer", "1234");
-		Customer customer4 = new Customer("Kobi", "1234");
-		Customer customer5 = new Customer("Maya", "1234");
-		Customer customer6 = new Customer("Aurora", "1234");
-		Company company1 = new Company("Yesplanet", "1234", "Yesplanet@gmail.com");
-		Company company2 = new Company("Hagor", "1234", "Hagor@gmail.com");
-		Company company3 = new Company("Japanika", "1234", "Japanika@gmail.com");
-		AdminFacade adminFacade = new AdminFacade();
-		CompanyFacade companyFacade = new CompanyFacade();
-		CustomerFacade customerFacade = new CustomerFacade();
+//		Customer customer1 = new Customer("Sean", "1234");
+//		Customer customer2 = new Customer("Michael", "1234");
+//		Customer customer3 = new Customer("Tomer", "1234");
+//		Customer customer4 = new Customer("Kobi", "1234");
+//		Customer customer5 = new Customer("Maya", "1234");
+//		Customer customer6 = new Customer("Aurora", "1234");
+//		Company company1 = new Company("Yesplanet", "1234", "Yesplanet@gmail.com");
+//		Company company2 = new Company("Hagor", "1234", "Hagor@gmail.com");
+//		Company company3 = new Company("Japanika", "1234", "Japanika@gmail.com");
+//		AdminFacade adminFacade = new AdminFacade();
+//		CompanyFacade companyFacade = new CompanyFacade();
+//		CustomerFacade customerFacade = new CustomerFacade();
 
-		CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
+		//CouponSystem.getInstance().login("admin", "1234", clientType.ADMINISTRATOR);
 		// adminFacade.createCompany(company1);
 		// adminFacade.createCompany(company2);
 		// adminFacade.createCompany(company3);
@@ -79,11 +79,11 @@ public class Testing {
 		// customerFacade.purchaseCoupon(customer1, coupon4);
 		// customerFacade.purchaseCoupon(customer1, coupon3);
 
-		//CouponSystem.getInstance().login("Sean", "1234", clientType.CUSTOMER);
-
-//		customerFacade.getAllCustomers();
-//		System.out.println(customerFacade.getCustomer(1));
-//		System.out.println(customerFacade.getAllPurchasedHistory(1));
+//		CustomerFacade customerFacade2 = (CustomerFacade) CouponSystem.getInstance().login("Sean", "1234", clientType.CUSTOMER);
+//
+//		System.out.println(customerFacade2.getAllCustomers());
+//		System.out.println(customerFacade2.getCustomer(1));
+//		System.out.println(customerFacade2.getAllPurchasedCouponsByPrice(100));
 //		 customerFacade.login("Michael", "1234", clientType.CUSTOMER);
 //
 //		System.out.println(customerFacade.getAllPurchasedCouponsByPrice(10));
@@ -94,9 +94,9 @@ public class Testing {
 
 		// System.out.println(adminFacade.getAllCoupons());
 		//
-		  adminFacade.getAllCompanies();
-		  adminFacade.getAllCustomers();
-		  System.out.println(adminFacade.getAllCoupons());
+//		  adminFacade.getAllCompanies();
+//		  adminFacade.getAllCustomers();
+//		  System.out.println(adminFacade.getAllCoupons());
 		//
 		 //companyFacade.login("Yesplanet", "1234", clientType.COMPANY);
 		// // companyFacade.removeCoupon(coupon1);
@@ -134,7 +134,7 @@ public class Testing {
 
 		CouponSystem.getInstance().stopTask();
 		// ConnectionPoolBlockingQueue.getInstance().shutDownConnections();
-		ConnectionPoolBlockingQueue.getInstance().closeAllConnections();
+		//ConnectionPoolBlockingQueue.getInstance().closeAllConnections();
 		// ConnectionPool.getInstance().closeAllConnections();
 
 		System.out.println("End.");

@@ -71,7 +71,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			preparedStatement.setLong(1, id);
 			ResultSet resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
-				custName = resultSet.getString("comp_name");
+				custName = resultSet.getString("cust_name");
 			}
 			if (custName != null) {
 				doesCustomerExists = true;
@@ -245,7 +245,6 @@ public class CustomerDBDAO implements CustomerDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return wantedCustomer;
