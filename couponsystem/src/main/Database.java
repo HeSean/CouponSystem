@@ -31,10 +31,9 @@ public class Database {
 		try {
 			connection = DriverManager.getConnection(getDBURL());
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String sql = "CREATE TABLE Coupons (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , title varchar(45)  NOT NULL, start_Date Date  NOT NULL, end_Date Date  NOT NULL,  amount int (64)  NOT NULL, type ENUM(\"RESTAURANTS\",\r\n"
+		String sql = "CREATE TABLE Coupons (id bigint(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , title varchar(45)  NOT NULL, start_Date Date  NOT NULL, end_Date Date  NOT NULL,  amount int (64)  NOT NULL, type ENUM(\"RESTAURANTS\",\r\n"
 				+ "		\"ELECTRICITY\",\r\n" + "		\"FOOD\",\r\n" + "		\"HEALTH\",\r\n"
 				+ "		\"SPORTS\",\r\n" + "		\"CAMPING\",\r\n"
 				+ "		\"TRAVELLING\")  NOT NULL, message varchar(45)  NOT NULL, price double, image varchar(45)  NOT NULL);";
@@ -56,7 +55,7 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String sql = "CREATE TABLE Customers (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , cust_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL);";
+		String sql = "CREATE TABLE Customers (id bigint(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , cust_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL);";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.executeUpdate();
@@ -75,7 +74,7 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String sql = "CREATE TABLE companys (id int(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , comp_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL, email varchar(45)  NOT NULL);";
+		String sql = "CREATE TABLE companys (id bigint(64) NOT NULL AUTO_INCREMENT PRIMARY KEY , comp_name varchar(45)  NOT NULL, password varchar(45)  NOT NULL, email varchar(45)  NOT NULL);";
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.executeUpdate();
@@ -96,8 +95,8 @@ public class Database {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String sql = "\r\n" + "CREATE TABLE customers_coupon (\r\n" + "customer_id int NOT NULL ,\r\n"
-				+ "coupon_id int NOT NULL ,    \r\n"
+		String sql = "\r\n" + "CREATE TABLE customers_coupon (\r\n" + "customer_id bigint NOT NULL ,\r\n"
+				+ "coupon_id bigint NOT NULL ,    \r\n"
 				+ "FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE cascade,\r\n"
 				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n"
 				+ "primary key (customer_id, coupon_id)\r\n" + ");";
@@ -119,8 +118,8 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String sql = "CREATE TABLE companys_coupon (\r\n" + "company_id int NOT NULL ,\r\n"
-				+ "coupon_id int NOT NULL,    \r\n"
+		String sql = "CREATE TABLE companys_coupon (\r\n" + "company_id bigint NOT NULL ,\r\n"
+				+ "coupon_id bigint NOT NULL,    \r\n"
 				+ "FOREIGN KEY (company_id) REFERENCES companys(id) ON DELETE cascade,\r\n"
 				+ "FOREIGN KEY (coupon_id) REFERENCES coupons(id) ON DELETE cascade,\r\n"
 				+ "primary key (company_id, coupon_id)\r\n" + ");";
